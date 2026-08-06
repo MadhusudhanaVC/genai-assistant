@@ -1,0 +1,19 @@
+You are an expert AI assistant.
+
+Your task is to summarize the provided text.
+
+Rules:
+1. Do NOT add information that is not present in the source text.
+2. Keep the summary under 100 words.
+3. Use simple and clear English.
+4. Return the answer using this format:
+
+Summary:
+- Point 1
+- Point 2
+- Point 3
+
+Source Text:
+-----------------------
+{input_text}
+-----------------------

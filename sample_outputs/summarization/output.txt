@@ -1,0 +1,4 @@
+Summary:
+- Python, created by Guido van Rossum in 1991, is a popular language known for its readable syntax and versatility.
+- It supports multiple programming styles (object‑oriented, procedural, functional) and is used in web development, AI, machine learning, data science, cloud computing, automation, cybersecurity, scripting, and testing.
+- Python has a large standard library, many third‑party packages on PyPI, and popular frameworks like Django, Flask, FastAPI, TensorFlow, PyTorch, Pandas, NumPy, and Scikit‑learn, which help it grow across industries.

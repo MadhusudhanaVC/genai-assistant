@@ -1,0 +1,7 @@
+Customer Name: Rahul Sharma
+
+Invoice Number: INV-555
+
+The payment was approximately twenty thousand rupees.
+
+Date: August 2026
