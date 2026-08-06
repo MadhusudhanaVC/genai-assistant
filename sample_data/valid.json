@@ -1,0 +1,16 @@
+[
+  {
+    "document_id": "DOC001",
+    "title": "Python Basics",
+    "content": "Python is an easy programming language.",
+    "source_path": "docs/python.txt",
+    "updated_at": "2026-08-06"
+  },
+  {
+    "document_id": "DOC002",
+    "title": "AI Introduction",
+    "content": "Artificial Intelligence is changing the world.",
+    "source_path": "docs/ai.txt",
+    "updated_at": "2026-08-06"
+  }
+]

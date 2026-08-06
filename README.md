@@ -1,79 +1,49 @@
 # GenAI Assistant
 
-A production-ready Generative AI Assistant project built using Python and FastAPI.
+## Project Overview
 
----
+This project is a backend foundation for a GenAI Assistant.
 
-## 📌 Project Overview
+Day 2 features include:
 
-This project is being developed as part of the GenAI Team Practical Roadmap.
-
-Current Features
-
-- Project Structure
-- Virtual Environment
-- Configuration Management
-- Git Repository
-- Smoke Test
-
-Future Features
-
-- RAG Pipeline
-- Vector Database
-- FastAPI APIs
-- Guardrails
-- Evaluation
-- Voice Assistant
+- JSON document validation using Pydantic
+- Command Line Interface (CLI) document loader
+- SQLite database integration
+- Processing event logging
+- Automated testing using Pytest
 
 ---
 
 ## Project Structure
 
-```text
+```
 genai-assistant/
-
-app/
-    api/
-    core/
-    db/
-    rag/
-    safety/
-    voice/
-
-tests/
-scripts/
-evals/
-docs/
-
-requirements.txt
-.env.example
-.gitignore
-README.md
+│
+├── app/
+│   ├── db/
+│   ├── models/
+│   ├── rag/
+│   ├── safety/
+│   └── voice/
+│
+├── sample_data/
+├── scripts/
+├── tests/
+├── README.md
+└── requirements.txt
 ```
 
 ---
 
 ## Setup
 
-### Clone Repository
+Create Virtual Environment
 
 ```bash
-git clone <repository-url>
+python -m venv .venv
 ```
 
-### Go to Project
-
-```bash
-cd genai-assistant
-```
-
-### Create Virtual Environment
-
-```bash
-py -3.11 -m venv .venv
-```
-
-### Activate Environment
+Activate
 
 Windows
 
@@ -81,38 +51,51 @@ Windows
 .venv\Scripts\activate
 ```
 
-### Install Dependencies
+Install Packages
 
 ```bash
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ---
 
-## Run Smoke Test
+## Create Database
 
 ```bash
-python -m app.main
-```
-
-Expected Output
-
-```
-Project setup completed successfully!
+python -m scripts.create_database
 ```
 
 ---
 
-## Tech Stack
+## Load Documents
+
+```bash
+python -m scripts.load_documents sample_data/valid.json
+```
+
+---
+
+## View Database
+
+```bash
+python -m scripts.view_database
+```
+
+---
+
+## Run Tests
+
+```bash
+python -m pytest
+```
+
+---
+
+## Technologies Used
 
 - Python 3.11
-- FastAPI
+- SQLite
 - SQLAlchemy
 - Pydantic
 - Pytest
-
----
-
-## Author
-
-GenAI Team
+- Git
