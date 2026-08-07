@@ -1,0 +1,102 @@
+[
+    {
+        "case_id": "SUM001",
+        "task": "summarization",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 11.26,
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "SUM002",
+        "task": "summarization",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 21.6,
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "SUM003",
+        "task": "summarization",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 5.68,
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "EXT001",
+        "task": "extraction",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 18.64,
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "EXT002",
+        "task": "extraction",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 11.4,
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "EXT003",
+        "task": "extraction",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 5.18,
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "CLS001",
+        "task": "classification",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 11.89,
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "CLS002",
+        "task": "classification",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 6.74,
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "CLS003",
+        "task": "classification",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 2.52,
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "CLS004",
+        "task": "classification",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 2.59,
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    }
+]

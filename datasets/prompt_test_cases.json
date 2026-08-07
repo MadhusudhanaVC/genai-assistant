@@ -1,0 +1,72 @@
+[
+    {
+        "case_id": "SUM001",
+        "task": "summarization",
+        "input_file": "sample_inputs/summarization/normal.txt",
+        "expected_structure": "SummaryOutput",
+        "expected_value": "summary"
+    },
+    {
+        "case_id": "SUM002",
+        "task": "summarization",
+        "input_file": "sample_inputs/summarization/long.txt",
+        "expected_structure": "SummaryOutput",
+        "expected_value": "summary"
+    },
+    {
+        "case_id": "SUM003",
+        "task": "summarization",
+        "input_file": "sample_inputs/summarization/ambiguous.txt",
+        "expected_structure": "SummaryOutput",
+        "expected_value": "summary"
+    },
+    {
+        "case_id": "EXT001",
+        "task": "extraction",
+        "input_file": "sample_inputs/extraction/normal.txt",
+        "expected_structure": "ExtractionOutput",
+        "expected_value": "document_id"
+    },
+    {
+        "case_id": "EXT002",
+        "task": "extraction",
+        "input_file": "sample_inputs/extraction/long.txt",
+        "expected_structure": "ExtractionOutput",
+        "expected_value": "document_id"
+    },
+    {
+        "case_id": "EXT003",
+        "task": "extraction",
+        "input_file": "sample_inputs/extraction/incomplete.txt",
+        "expected_structure": "ExtractionOutput",
+        "expected_value": "customer_name"
+    },
+    {
+        "case_id": "CLS001",
+        "task": "classification",
+        "input_file": "sample_inputs/classification/normal.txt",
+        "expected_structure": "ClassificationOutput",
+        "expected_value": "Request"
+    },
+    {
+        "case_id": "CLS002",
+        "task": "classification",
+        "input_file": "sample_inputs/classification/long.txt",
+        "expected_structure": "ClassificationOutput",
+        "expected_value": "Request"
+    },
+    {
+        "case_id": "CLS003",
+        "task": "classification",
+        "input_file": "sample_inputs/classification/ambiguous.txt",
+        "expected_structure": "ClassificationOutput",
+        "expected_value": "Feedback"
+    },
+    {
+        "case_id": "CLS004",
+        "task": "classification",
+        "input_file": "sample_inputs/classification/incomplete.txt",
+        "expected_structure": "ClassificationOutput",
+        "expected_value": "Request"
+    }
+]

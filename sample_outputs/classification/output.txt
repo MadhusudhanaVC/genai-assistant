@@ -1,4 +1,4 @@
 {
-    "label": "Complaint",
-    "reason": "Defective product, request for replacement or refund."
+    "label": "Request",
+    "reason": "User asks for a replacement due to a defective laptop."
 }

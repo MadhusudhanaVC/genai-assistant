@@ -7,6 +7,7 @@ Purpose:
 - Read input files.
 - Replace placeholders.
 - Send prompts to the LLM.
+- Validate responses.
 - Save generated outputs.
 
 Supports:
@@ -18,68 +19,92 @@ Supports:
 # ==================================================
 # Standard Library Imports
 # ==================================================
+
 import argparse
 from pathlib import Path
 
 # ==================================================
 # Local Imports
 # ==================================================
-from app.llm.client import generate_response
 
+from app.llm.client import generate_response
+from app.llm.validator import validate_response
 
 # ==================================================
 # Read Text File
 # ==================================================
+
+
 def read_text_file(file_path: Path) -> str:
     """
     Read and return the contents of a text file.
-
-    Parameters
-    ----------
-    file_path : Path
-        Path of the text file.
-
-    Returns
-    -------
-    str
-        File contents.
     """
 
     if not file_path.exists():
-        raise FileNotFoundError(f"File not found: {file_path}")
+        raise FileNotFoundError(
+            f"File not found: {file_path}"
+        )
 
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(
+        file_path,
+        "r",
+        encoding="utf-8",
+    ) as file:
+
         return file.read()
 
 
 # ==================================================
 # Save Output
 # ==================================================
-def save_output(output_path: Path, content: str):
+
+
+def save_output(
+    output_path: Path,
+    content: str,
+):
     """
-    Save generated response into a text file.
+    Save generated response to a file.
     """
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
-    with open(output_path, "w", encoding="utf-8") as file:
+    with open(
+        output_path,
+        "w",
+        encoding="utf-8",
+    ) as file:
+
         file.write(content)
 
 
 # ==================================================
-# Build Final Prompt
+# Build Prompt
 # ==================================================
-def build_prompt(prompt_template: str, input_text: str) -> str:
+
+
+def build_prompt(
+    prompt_template: str,
+    input_text: str,
+) -> str:
     """
-    Replace the placeholder with actual input text.
+    Replace placeholders with user input.
     """
 
-    return prompt_template.replace("{input_text}", input_text)
+    return prompt_template.replace(
+        "{input_text}",
+        input_text,
+    )
 
 
 # ==================================================
-# Main Function
+# Main
 # ==================================================
+
+
 def main():
 
     parser = argparse.ArgumentParser(
@@ -104,21 +129,32 @@ def main():
     args = parser.parse_args()
 
     # --------------------------------------------------
-    # Build file paths
+    # Paths
     # --------------------------------------------------
 
-    prompt_path = Path("prompts") / f"{args.task}.txt"
-    input_path = Path(args.input_file)
+    prompt_path = (
+        Path("prompts")
+        / f"{args.task}.txt"
+    )
+
+    input_path = Path(
+        args.input_file
+    )
 
     # --------------------------------------------------
-    # Read files
+    # Read Files
     # --------------------------------------------------
 
-    prompt_template = read_text_file(prompt_path)
-    input_text = read_text_file(input_path)
+    prompt_template = read_text_file(
+        prompt_path
+    )
+
+    input_text = read_text_file(
+        input_path
+    )
 
     # --------------------------------------------------
-    # Build final prompt
+    # Build Prompt
     # --------------------------------------------------
 
     final_prompt = build_prompt(
@@ -126,24 +162,59 @@ def main():
         input_text,
     )
 
-    # ==================================================
+    # --------------------------------------------------
     # DEBUG
-    # ==================================================
-    # Uncomment these lines whenever you want to inspect
-    # the exact prompt sent to the model.
+    # --------------------------------------------------
 
     # print("\n========== FINAL PROMPT ==========\n")
     # print(final_prompt)
     # print("\n==================================\n")
 
     # --------------------------------------------------
-    # Generate response
+    # Generate Response
     # --------------------------------------------------
 
-    response = generate_response(final_prompt)
+    try:
+
+        response = generate_response(
+            final_prompt
+        )
+
+    except Exception as error:
+
+        print("\n===================================")
+        print("❌ Model Request Failed")
+        print("-----------------------------------")
+        print(error)
+        print("===================================")
+
+        return
 
     # --------------------------------------------------
-    # Save output
+    # Validate Response
+    # --------------------------------------------------
+
+    success, validated_output, failure_category = (
+        validate_response(
+            args.task,
+            response["text"],
+        )
+    )
+
+    if not success:
+
+        print("\n===================================")
+        print("❌ Response Validation Failed")
+        print("-----------------------------------")
+        print("Failure Type :", failure_category)
+        print("-----------------------------------")
+        print(validated_output)
+        print("===================================")
+
+        return
+
+    # --------------------------------------------------
+    # Save Output
     # --------------------------------------------------
 
     output_path = (
@@ -164,11 +235,17 @@ def main():
     print("\n===================================")
     print("✅ Prompt executed successfully!")
     print("-----------------------------------")
-    print("Task    :", args.task)
-    print("Model   :", response["model"])
-    print("Latency :", response["latency_seconds"], "seconds")
+    print("Task     :", args.task)
+    print("Model    :", response["model"])
+    print(
+        "Latency :",
+        response["latency_seconds"],
+        "seconds",
+    )
     print("-----------------------------------")
-    print(response["text"])
+    print("✅ Validation Passed")
+    print("-----------------------------------")
+    print(validated_output)
     print("-----------------------------------")
     print("Output saved to:")
     print(output_path)
@@ -176,7 +253,8 @@ def main():
 
 
 # ==================================================
-# Program Entry
+# Entry Point
 # ==================================================
+
 if __name__ == "__main__":
     main()
