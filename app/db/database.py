@@ -1,13 +1,3 @@
-"""
-Database Configuration
-----------------------
-
-Purpose:
-- Create a SQLite database connection.
-- Manage database sessions.
-- Create tables when the application starts.
-"""
-
 # SQLAlchemy engine is responsible for connecting to the database.
 from sqlalchemy import create_engine
 
@@ -18,18 +8,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
 
 
-# ----------------------------------------------------
-# Database Configuration
-# ----------------------------------------------------
 
 # SQLite database file.
 # It will automatically be created in the project root.
 DATABASE_URL = "sqlite:///genai.db"
 
 
-# ----------------------------------------------------
-# Create Database Engine
-# ----------------------------------------------------
 
 engine = create_engine(
     DATABASE_URL,
@@ -37,9 +21,6 @@ engine = create_engine(
 )
 
 
-# ----------------------------------------------------
-# Create Database Session
-# ----------------------------------------------------
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -48,16 +29,10 @@ SessionLocal = sessionmaker(
 )
 
 
-# ----------------------------------------------------
-# Base Class
-# ----------------------------------------------------
 
 Base = declarative_base()
 
 
-# ----------------------------------------------------
-# Helper Function
-# ----------------------------------------------------
 
 def get_db():
     """

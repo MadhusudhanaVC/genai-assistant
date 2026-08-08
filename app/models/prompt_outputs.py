@@ -1,33 +1,8 @@
-"""
-Prompt Output Models
---------------------
-
-Pydantic models used to validate LLM responses
-for the Prompt Playground tasks.
-
-Tasks:
-- Summarization
-- Information Extraction
-- Classification
-"""
-
-# ==================================================
-# Imports
-# ==================================================
-
 from typing import Optional, Literal
 
 from pydantic import BaseModel, Field
 
-
-# ==================================================
-# Summarization Output
-# ==================================================
-
 class SummaryOutput(BaseModel):
-    """
-    Expected output for summarization.
-    """
 
     summary: str = Field(
         ...,
@@ -36,15 +11,8 @@ class SummaryOutput(BaseModel):
     )
 
 
-# ==================================================
-# Extraction Output
-# ==================================================
 
 class ExtractionOutput(BaseModel):
-    """
-    Expected output for information extraction.
-    """
-
     document_id: Optional[str] = None
 
     customer_name: Optional[str] = None
@@ -56,14 +24,8 @@ class ExtractionOutput(BaseModel):
     amount: Optional[str] = None
 
 
-# ==================================================
-# Classification Output
-# ==================================================
 
 class ClassificationOutput(BaseModel):
-    """
-    Expected output for classification.
-    """
 
     label: Literal[
         "Complaint",

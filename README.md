@@ -243,7 +243,7 @@ Example:
 ```env
 OPENROUTER_API_KEY=your_openrouter_api_key
 
-OPENROUTER_MODEL=openai/gpt-oss-20b:free
+OPENROUTER_MODEL=google/gemma-4-26b-a4b-it:free
 
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 

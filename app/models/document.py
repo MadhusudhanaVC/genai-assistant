@@ -1,14 +1,3 @@
-"""
-Document Model
---------------
-This module defines the structure of a document.
-
-Purpose:
-- Validate JSON input.
-- Ensure required fields are present.
-- Prevent invalid data from entering the database.
-"""
-
 from pydantic import BaseModel, Field, field_validator
 
 

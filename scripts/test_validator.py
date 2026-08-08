@@ -1,7 +1,3 @@
-"""
-Test Response Validator
-"""
-
 from app.llm.validator import validate_response
 
 

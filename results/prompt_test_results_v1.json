@@ -3,100 +3,146 @@
         "case_id": "SUM001",
         "task": "summarization",
         "prompt_version": "v1",
-        "model": null,
-        "latency_seconds": null,
-        "validation_passed": false,
-        "failure_category": "MODEL_ERROR",
-        "failure_reason": "Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1786147200000'}, 'limit_source': 'openrouter_free_tier_daily', 'remedy_hint': 'Wait for the daily reset (see X-RateLimit-Reset), or purchase credits to raise your free-model daily limit.', 'provider_name': None, 'previous_errors': [{'code': 429, 'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day'}]}}, 'user_id': 'user_3HZyAwt8bIEHDzDee9jvtd37jE7'}"
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 15.28,
+        "generated_response": {
+            "summary": "Python is a high-level, interpreted programming language valued for its simplicity and readability. It supports various paradigms, such as object-oriented, procedural, and functional programming. Common applications include web development, data science, artificial intelligence, automation, and software development."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
     },
     {
         "case_id": "SUM002",
         "task": "summarization",
         "prompt_version": "v1",
-        "model": null,
-        "latency_seconds": null,
-        "validation_passed": false,
-        "failure_category": "MODEL_ERROR",
-        "failure_reason": "Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1786147200000'}, 'limit_source': 'openrouter_free_tier_daily', 'remedy_hint': 'Wait for the daily reset (see X-RateLimit-Reset), or purchase credits to raise your free-model daily limit.', 'provider_name': None, 'previous_errors': [{'code': 429, 'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day'}]}}, 'user_id': 'user_3HZyAwt8bIEHDzDee9jvtd37jE7'}"
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 7.36,
+        "generated_response": {
+            "summary": "Created by Guido van Rossum in 1991, Python is a popular programming language known for its simple, readable syntax. It supports object-oriented, procedural, and functional programming. Python is widely used in fields like web development, artificial intelligence, data science, and automation. It features a large standard library and many third-party packages through PyPI, including frameworks like Django, TensorFlow, and Pandas. Its versatility and strong community support contribute to its ongoing popularity across various industries."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
     },
     {
         "case_id": "SUM003",
         "task": "summarization",
         "prompt_version": "v1",
-        "model": null,
-        "latency_seconds": null,
-        "validation_passed": false,
-        "failure_category": "MODEL_ERROR",
-        "failure_reason": "Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1786147200000'}, 'limit_source': 'openrouter_free_tier_daily', 'remedy_hint': 'Wait for the daily reset (see X-RateLimit-Reset), or purchase credits to raise your free-model daily limit.', 'provider_name': None, 'previous_errors': [{'code': 429, 'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day'}]}}, 'user_id': 'user_3HZyAwt8bIEHDzDee9jvtd37jE7'}"
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 3.91,
+        "generated_response": {
+            "summary": "Artificial Intelligence is gaining popularity as organizations invest in it to improve productivity, automate tasks, and enhance decision-making. Despite these benefits, concerns exist regarding ethics, privacy, responsible development, and job displacement."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
     },
     {
         "case_id": "EXT001",
         "task": "extraction",
         "prompt_version": "v1",
-        "model": null,
-        "latency_seconds": null,
-        "validation_passed": false,
-        "failure_category": "MODEL_ERROR",
-        "failure_reason": "Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1786147200000'}, 'limit_source': 'openrouter_free_tier_daily', 'remedy_hint': 'Wait for the daily reset (see X-RateLimit-Reset), or purchase credits to raise your free-model daily limit.', 'provider_name': None, 'previous_errors': [{'code': 429, 'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day'}]}}, 'user_id': 'user_3HZyAwt8bIEHDzDee9jvtd37jE7'}"
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 5.28,
+        "generated_response": {
+            "document_id": "DOC-101",
+            "customer_name": "ABC Technologies Pvt Ltd",
+            "invoice_number": "INV-2026-001",
+            "invoice_date": "06-08-2026",
+            "amount": "₹18,500"
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
     },
     {
         "case_id": "EXT002",
         "task": "extraction",
         "prompt_version": "v1",
-        "model": null,
-        "latency_seconds": null,
-        "validation_passed": false,
-        "failure_category": "MODEL_ERROR",
-        "failure_reason": "Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1786147200000'}, 'limit_source': 'openrouter_free_tier_daily', 'remedy_hint': 'Wait for the daily reset (see X-RateLimit-Reset), or purchase credits to raise your free-model daily limit.', 'provider_name': None, 'previous_errors': [{'code': 429, 'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day'}]}}, 'user_id': 'user_3HZyAwt8bIEHDzDee9jvtd37jE7'}"
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 7.96,
+        "generated_response": {
+            "document_id": "DOC-202",
+            "customer_name": "Global Tech Solutions",
+            "invoice_number": "INV-2026-542",
+            "invoice_date": "05-08-2026",
+            "amount": "₹74,950"
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
     },
     {
         "case_id": "EXT003",
         "task": "extraction",
         "prompt_version": "v1",
-        "model": null,
-        "latency_seconds": null,
-        "validation_passed": false,
-        "failure_category": "MODEL_ERROR",
-        "failure_reason": "Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1786147200000'}, 'limit_source': 'openrouter_free_tier_daily', 'remedy_hint': 'Wait for the daily reset (see X-RateLimit-Reset), or purchase credits to raise your free-model daily limit.', 'provider_name': None, 'previous_errors': [{'code': 429, 'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day'}]}}, 'user_id': 'user_3HZyAwt8bIEHDzDee9jvtd37jE7'}"
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 15.44,
+        "generated_response": {
+            "document_id": null,
+            "customer_name": "ABC Pvt Ltd",
+            "invoice_number": null,
+            "invoice_date": "06-08-2026",
+            "amount": null
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
     },
     {
         "case_id": "CLS001",
         "task": "classification",
         "prompt_version": "v1",
-        "model": null,
-        "latency_seconds": null,
-        "validation_passed": false,
-        "failure_category": "MODEL_ERROR",
-        "failure_reason": "Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1786147200000'}, 'limit_source': 'openrouter_free_tier_daily', 'remedy_hint': 'Wait for the daily reset (see X-RateLimit-Reset), or purchase credits to raise your free-model daily limit.', 'provider_name': None, 'previous_errors': [{'code': 429, 'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day'}]}}, 'user_id': 'user_3HZyAwt8bIEHDzDee9jvtd37jE7'}"
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 1.84,
+        "generated_response": {
+            "label": "Complaint",
+            "reason": "The user is reporting a defective product (cracked screen) that arrived in unusable condition."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
     },
     {
         "case_id": "CLS002",
         "task": "classification",
         "prompt_version": "v1",
-        "model": null,
-        "latency_seconds": null,
-        "validation_passed": false,
-        "failure_category": "MODEL_ERROR",
-        "failure_reason": "Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1786147200000'}, 'limit_source': 'openrouter_free_tier_daily', 'remedy_hint': 'Wait for the daily reset (see X-RateLimit-Reset), or purchase credits to raise your free-model daily limit.', 'provider_name': None, 'previous_errors': [{'code': 429, 'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day'}]}}, 'user_id': 'user_3HZyAwt8bIEHDzDee9jvtd37jE7'}"
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 1.95,
+        "generated_response": {
+            "label": "Complaint",
+            "reason": "The customer is reporting a faulty product and expressing dissatisfaction with the lack of support response."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
     },
     {
         "case_id": "CLS003",
         "task": "classification",
         "prompt_version": "v1",
-        "model": null,
-        "latency_seconds": null,
-        "validation_passed": false,
-        "failure_category": "MODEL_ERROR",
-        "failure_reason": "Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1786147200000'}, 'limit_source': 'openrouter_free_tier_daily', 'remedy_hint': 'Wait for the daily reset (see X-RateLimit-Reset), or purchase credits to raise your free-model daily limit.', 'provider_name': None, 'previous_errors': [{'code': 429, 'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day'}]}}, 'user_id': 'user_3HZyAwt8bIEHDzDee9jvtd37jE7'}"
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 3.0,
+        "generated_response": {
+            "label": "Feedback",
+            "reason": "The user is expressing an opinion about the quality of the packaging."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
     },
     {
         "case_id": "CLS004",
         "task": "classification",
         "prompt_version": "v1",
-        "model": null,
-        "latency_seconds": null,
-        "validation_passed": false,
-        "failure_category": "MODEL_ERROR",
-        "failure_reason": "Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1786147200000'}, 'limit_source': 'openrouter_free_tier_daily', 'remedy_hint': 'Wait for the daily reset (see X-RateLimit-Reset), or purchase credits to raise your free-model daily limit.', 'provider_name': None, 'previous_errors': [{'code': 429, 'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day'}]}}, 'user_id': 'user_3HZyAwt8bIEHDzDee9jvtd37jE7'}"
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 2.91,
+        "generated_response": {
+            "label": "Request",
+            "reason": "The user is expressing a need for assistance, which constitutes a formal request for help."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
     }
 ]

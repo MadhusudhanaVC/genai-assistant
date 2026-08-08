@@ -1,14 +1,3 @@
-"""
-Database Models
----------------
-
-This module defines all database tables.
-
-Tables:
-1. documents
-2. processing_events
-"""
-
 # Import SQLAlchemy column types
 from sqlalchemy import Column, Integer, String, Text, DateTime
 from datetime import datetime
@@ -18,9 +7,7 @@ from app.db.database import Base
 
 
 class Document(Base):
-    """
-    Stores successfully validated documents.
-    """
+
 
     # Table name inside SQLite
     __tablename__ = "documents"
@@ -42,9 +29,6 @@ class Document(Base):
 
 
 class ProcessingEvent(Base):
-    """
-    Stores processing history.
-    """
 
     # Table name
     __tablename__ = "processing_events"

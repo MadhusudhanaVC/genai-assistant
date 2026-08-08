@@ -1,11 +1,3 @@
-"""
-Validates LLM JSON responses using Pydantic models.
-"""
-
-# ==================================================
-# Imports
-# ==================================================
-
 import json
 
 from pydantic import ValidationError
@@ -16,15 +8,9 @@ from app.models.prompt_outputs import (
     ClassificationOutput,
 )
 
-# ==================================================
-# Clean LLM Output
-# ==================================================
 
 def clean_response(response_text: str) -> str:
-    """
-    Remove markdown code fences and extra text
-    before parsing JSON.
-    """
+
 
     response_text = response_text.strip()
 
@@ -49,24 +35,10 @@ def clean_response(response_text: str) -> str:
     return response_text
 
 
-# ==================================================
-# Validation Function
-# ==================================================
-
 def validate_response(task: str, response_text: str):
-    """
-    Validate an LLM response.
-    """
-
-    # --------------------------
-    # Clean Response
-    # --------------------------
 
     response_text = clean_response(response_text)
 
-    # --------------------------
-    # Parse JSON
-    # --------------------------
 
     try:
         data = json.loads(response_text)
@@ -79,9 +51,6 @@ def validate_response(task: str, response_text: str):
             "JSON_PARSE_ERROR",
         )
 
-    # --------------------------
-    # Select Model
-    # --------------------------
 
     model_map = {
         "summarization": SummaryOutput,
@@ -99,9 +68,6 @@ def validate_response(task: str, response_text: str):
             "CONFIG_ERROR",
         )
 
-    # --------------------------
-    # Validate Schema
-    # --------------------------s
 
     try:
 
