@@ -130,9 +130,13 @@ genai-assistant/
 │
 ├── results/
 │   ├── prompt_test_results_v1.json
-│   └── prompt_test_results_v2.json
+│   ├── prompt_test_results_v2.json
+│   ├── prompt_outputs_v1.md
+│   └── prompt_outputs_v2.md
 │
 ├── sample_data/
+│   ├── valid.json
+│   └── invalid.json
 │
 ├── sample_inputs/
 │   ├── summarization/
@@ -149,6 +153,7 @@ genai-assistant/
 ├── tests/
 │
 ├── .env.example
+├── .gitignore
 ├── PROMPT_COMPARISON.md
 ├── README.md
 └── requirements.txt
