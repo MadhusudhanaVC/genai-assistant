@@ -4,7 +4,7 @@
 
 Day 5 focuses on preparing approved documents for the Retrieval-Augmented Generation (RAG) pipeline.
 
-The goal is to build a reliable preprocessing pipeline that converts a collection of documents into clean, traceable, retrieval-ready chunks.
+The goal is to build a reliable preprocessing pipeline that converts a collection of documents into clean, traceable, retrieval ready chunks.
 
 The pipeline processes 30 approved sample documents and produces a normalized JSONL dataset containing chunk text and metadata.
 
