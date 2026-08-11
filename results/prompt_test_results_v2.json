@@ -1,0 +1,148 @@
+[
+    {
+        "case_id": "SUM001",
+        "task": "summarization",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 11.61,
+        "generated_response": {
+            "summary": "Python is a high-level, interpreted programming language valued for its simplicity and readability. It supports various paradigms and is used extensively in fields like web development, data science, and artificial intelligence."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "SUM002",
+        "task": "summarization",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 7.78,
+        "generated_response": {
+            "summary": "Created by Guido van Rossum in 1991, Python is a popular programming language known for its simple syntax and readability. It supports various programming paradigms and is widely used in fields like web development, artificial intelligence, and data science. The language benefits from a large library ecosystem and strong community support."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "SUM003",
+        "task": "summarization",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 5.28,
+        "generated_response": {
+            "summary": "Organizations are investing in AI to improve productivity, automate tasks, and enhance decision-making. However, concerns persist regarding job displacement, ethics, privacy, and responsible development."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "EXT001",
+        "task": "extraction",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 7.94,
+        "generated_response": {
+            "document_id": "DOC-101",
+            "customer_name": "ABC Technologies Pvt Ltd",
+            "invoice_number": "INV-2026-001",
+            "invoice_date": "06-08-2026",
+            "amount": "₹18,500"
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "EXT002",
+        "task": "extraction",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 7.42,
+        "generated_response": {
+            "document_id": "DOC-202",
+            "customer_name": "Global Tech Solutions",
+            "invoice_number": "INV-2026-542",
+            "invoice_date": "05-08-2026",
+            "amount": "₹74,950"
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "EXT003",
+        "task": "extraction",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 19.52,
+        "generated_response": {
+            "document_id": null,
+            "customer_name": "ABC Pvt Ltd",
+            "invoice_number": null,
+            "invoice_date": "06-08-2026",
+            "amount": null
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "CLS001",
+        "task": "classification",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 7.04,
+        "generated_response": {
+            "label": "Complaint",
+            "reason": "The customer is reporting damaged and non-functional hardware received in their order."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "CLS002",
+        "task": "classification",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 15.16,
+        "generated_response": {
+            "label": "Complaint",
+            "reason": "The user is reporting a faulty product and a lack of response from customer support."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "CLS003",
+        "task": "classification",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 3.4,
+        "generated_response": {
+            "label": "Feedback",
+            "reason": "The user is expressing an opinion regarding the quality of the packaging."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    },
+    {
+        "case_id": "CLS004",
+        "task": "classification",
+        "prompt_version": "v2",
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "latency_seconds": 10.82,
+        "generated_response": {
+            "label": "Inquiry",
+            "reason": "The user is seeking assistance or information without a specific complaint or request for action."
+        },
+        "validation_passed": true,
+        "failure_category": null,
+        "failure_reason": null
+    }
+]

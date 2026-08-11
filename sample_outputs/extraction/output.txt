@@ -1,0 +1,1 @@
+{"document_id":"DOC-101","customer_name":"ABC Technologies Pvt Ltd","invoice_number":"INV-2026-001","invoice_date":"06-08-2026","amount":"₹18,500"}

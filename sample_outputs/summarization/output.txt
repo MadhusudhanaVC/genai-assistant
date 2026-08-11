@@ -1,0 +1,3 @@
+{
+    "summary": "Python is a high-level, interpreted programming language characterized by its simplicity and readability. It supports multiple paradigms, such as object-oriented, procedural, and functional programming. Its applications include web development, data science, artificial intelligence, automation, and software development."
+}

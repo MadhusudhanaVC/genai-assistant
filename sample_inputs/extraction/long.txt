@@ -1,0 +1,16 @@
+Document ID: DOC-202
+
+Customer Name: Global Tech Solutions
+
+Invoice Number: INV-2026-542
+
+Invoice Date: 05-08-2026
+
+Amount: ₹74,950
+
+Payment Status: Paid
+
+GST Number: 29ABCDE1234F1Z5
+
+Address:
+Bangalore, Karnataka

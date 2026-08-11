@@ -1,0 +1,4 @@
+{
+    "label": "Request",
+    "reason": "User asks for a replacement due to a defective laptop."
+}

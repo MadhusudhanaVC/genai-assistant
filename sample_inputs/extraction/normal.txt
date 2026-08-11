@@ -1,0 +1,9 @@
+Document ID: DOC-101
+
+Customer Name: ABC Technologies Pvt Ltd
+
+Invoice Number: INV-2026-001
+
+Invoice Date: 06-08-2026
+
+Amount: ₹18,500

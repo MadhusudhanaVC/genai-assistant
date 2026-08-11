@@ -1,0 +1,7 @@
+Python is one of the world's most popular programming languages. It was created by Guido van Rossum and first released in 1991. Python emphasizes code readability with a simple syntax, making it easy for beginners to learn while remaining powerful enough for professionals.
+
+Python supports object-oriented programming, procedural programming, and functional programming. Developers use Python for web development, artificial intelligence, machine learning, data science, cloud computing, automation, cybersecurity, scripting, and software testing.
+
+Python has a large standard library and thousands of third-party packages available through PyPI. Popular frameworks include Django, Flask, FastAPI, TensorFlow, PyTorch, Pandas, NumPy, and Scikit-learn.
+
+Because of its versatility and strong community support, Python continues to grow in popularity across industries.
