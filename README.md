@@ -2,35 +2,72 @@
 
 ## Overview
 
-Day 5 focuses on preparing approved documents for the Retrieval-Augmented Generation (RAG) pipeline.
+Day 5 focuses on preparing approved documents for the **Retrieval-Augmented Generation (RAG)** pipeline.
 
-The goal is to build a reliable preprocessing pipeline that converts a collection of documents into clean, traceable, retrieval ready chunks.
+The goal is to build a reliable preprocessing pipeline that converts source documents into clean, meaningful, traceable, and retrieval-ready chunks.
 
-The pipeline processes 30 approved sample documents and produces a normalized JSONL dataset containing chunk text and metadata.
-
----
-
-## Day 5 Objective
-
-Build a preprocessing pipeline that:
-
-- Loads approved Markdown, text, or HTML documents.
-- Assigns a stable document ID to every document.
-- Cleans and normalizes document text.
-- Preserves meaningful Markdown headings.
-- Splits documents into configurable chunks.
-- Uses configurable chunk size and overlap.
-- Attaches complete metadata to every chunk.
-- Produces an inspectable JSONL dataset.
-- Detects and reports document processing failures.
-- Provides automated tests for the chunking logic.
-- Includes a chunk-quality review for selected documents.
+The current implementation processes **30 approved sample documents** and generates a normalized **JSONL dataset containing 47 chunks**, with metadata attached to every chunk.
 
 ---
 
-## Project Structure
+## Day 5 Objectives
+
+The preprocessing pipeline is designed to:
+
+- Load approved Markdown, text, or HTML documents.
+- Assign a stable document ID to every document.
+- Remove unnecessary document front matter.
+- Clean and normalize document text.
+- Preserve meaningful Markdown headings.
+- Split documents into logical sections.
+- Create configurable chunks using chunk size and overlap.
+- Preserve useful context between chunks using overlap.
+- Avoid unnecessary splitting of Markdown code blocks.
+- Attach complete metadata to every chunk.
+- Generate an inspectable JSONL dataset.
+- Detect and report document-processing failures.
+- Validate chunking behavior using automated tests.
+- Inspect representative chunks for quality.
+- Correct document-content issues identified during review.
+
+---
+
+## Day 5 Processing Flow
 
 ```text
+Approved Documents
+        │
+        ▼
+Read Documents
+        │
+        ▼
+Remove Front Matter
+        │
+        ▼
+Clean & Normalize Text
+        │
+        ▼
+Detect Markdown Sections
+        │
+        ▼
+Create Chunks
+        │
+        ├── Small Sections → Combine
+        │
+        └── Large Sections → Split
+        │
+        ▼
+Apply Chunk Overlap
+        │
+        ▼
+Attach Metadata
+        │
+        ▼
+Generate JSONL Dataset
+        │
+        ▼
+Validate & Review
+
 app/
 └── rag/
     └── chunking.py
@@ -45,6 +82,10 @@ sample_data/
 └── day5_documents/
     ├── DOC001_python_basics.md
     ├── DOC002_python_functions.md
+    ├── DOC003_python_exception_handling.md
+    ├── DOC004_python_modules.md
+    ├── DOC005_python_virtual_environments.md
+    ├── DOC006_python_testing.md
     ├── ...
     └── DOC030_ai_natural_language_processing.md
 
