@@ -66,8 +66,13 @@ Attach Metadata
 Generate JSONL Dataset
         │
         ▼
-Validate & Review
+Validate Dataset
+        │
+        ▼
+Run Automated Tests
 
+---
+```
 app/
 └── rag/
     └── chunking.py
@@ -92,3 +97,7 @@ sample_data/
 results/
 ├── chunks.jsonl
 └── chunk_quality_review.md
+        │
+        ▼
+Inspect Chunk Quality
+```
