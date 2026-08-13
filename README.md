@@ -74,33 +74,34 @@ Run Automated Tests
 ---
 
 
-## Day 5 Processing Flow
+## Day 5 Project Structure
 ```text
-app/
-└── rag/
-    └── chunking.py
-
-scripts/
-└── preprocess_documents.py
-
-tests/
-└── test_chunking.py
-
-sample_data/
-└── day5_documents/
-    ├── DOC001_python_basics.md
-    ├── DOC002_python_functions.md
-    ├── DOC003_python_exception_handling.md
-    ├── DOC004_python_modules.md
-    ├── DOC005_python_virtual_environments.md
-    ├── DOC006_python_testing.md
-    ├── ...
-    └── DOC030_ai_natural_language_processing.md
-
-results/
-├── chunks.jsonl
-└── chunk_quality_review.md
-        │
-        ▼
-Inspect Chunk Quality
+genai-assistant/
+│
+├── app/
+│   └── rag/
+│       └── chunking.py
+│
+├── scripts/
+│   └── preprocess_documents.py
+│
+├── tests/
+│   └── test_chunking.py
+│
+├── sample_data/
+│   └── day5_documents/
+│       ├── DOC001_python_basics.md
+│       ├── DOC002_python_functions.md
+│       ├── DOC003_python_exception_handling.md
+│       ├── DOC004_python_modules.md
+│       ├── DOC005_python_virtual_environments.md
+│       ├── DOC006_python_testing.md
+│       ├── DOC007_git_basics.md
+│       ├── DOC008_git_branches.md
+│       ├── ...
+│       └── DOC030_ai_natural_language_processing.md
+│
+└── results/
+    ├── chunks.jsonl
+    └── chunk_quality_review.md
 ```
