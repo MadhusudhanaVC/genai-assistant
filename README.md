@@ -70,9 +70,11 @@ Validate Dataset
         │
         ▼
 Run Automated Tests
-
 ---
-```
+
+
+## Day 5 Processing Flow
+```text
 app/
 └── rag/
     └── chunking.py
@@ -100,4 +102,3 @@ results/
         │
         ▼
 Inspect Chunk Quality
-```
