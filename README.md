@@ -2,13 +2,13 @@
 
 A modular Python-based **Generative AI Assistant** built as part of a structured **20-Day AI Engineering Roadmap**.
 
-The project focuses on learning and implementing production-oriented AI engineering concepts such as structured outputs, prompt engineering, validation, testing, database integration, and LLM application development.
+The project focuses on learning and implementing production-oriented AI engineering concepts such as structured outputs, prompt engineering, validation, testing, database integration, embeddings, vector databases, semantic search, and Retrieval-Augmented Generation (RAG).
 
 The goal is to gradually evolve this project into a complete AI Assistant with Retrieval-Augmented Generation (RAG), vector databases, FastAPI services, voice capabilities, AI safety guardrails, and production deployment.
 
 ---
 
-# Project Highlights
+## 📋 Project Highlights
 
 - Modular project architecture
 - OpenRouter/OpenAI compatible LLM integration
@@ -21,12 +21,23 @@ The goal is to gradually evolve this project into a complete AI Assistant with R
 - Automated testing using Pytest
 - Versioned prompt templates
 - AI response latency tracking
+- Document preprocessing and chunking
+- Sentence Transformer embeddings
+- `all-MiniLM-L6-v2` embedding model
+- 384-dimensional embedding vectors
+- ChromaDB vector database
+- Semantic search
+- Top-K retrieval
+- Metadata filtering
+- Minimum similarity score filtering
+- Retrieval evaluation
+- Retrieval result reporting
 
 ---
 
-# Features by Roadmap
+## 🚀 Features by Roadmap
 
-## ✅ Day 1 – Project Foundation
+### ✅ Day 1 – Project Foundation
 
 - Python project structure
 - Virtual environment setup
@@ -36,7 +47,7 @@ The goal is to gradually evolve this project into a complete AI Assistant with R
 
 ---
 
-## ✅ Day 2 – Data Validation & Storage
+### ✅ Day 2 – Data Validation & Storage
 
 - JSON document validation using Pydantic
 - CLI document loader
@@ -48,26 +59,23 @@ The goal is to gradually evolve this project into a complete AI Assistant with R
 
 ---
 
-## ✅ Day 3 – Prompt Playground
+### ✅ Day 3 – Prompt Playground
 
 Implemented a reusable Prompt Playground capable of handling multiple business-oriented AI tasks.
 
-### Features
-
+**Features:**
 - Shared OpenRouter/OpenAI client wrapper
 - Model latency measurement
 - Prompt templates stored separately
 - Prompt placeholder replacement
 - Reusable prompt execution pipeline
 
-### Supported Tasks
-
+**Supported Tasks:**
 - Text Summarization
 - Information Extraction
 - Text Classification
 
-### Deliverables
-
+**Deliverables:**
 - Prompt Playground
 - Prompt Templates
 - Sample Inputs
@@ -76,12 +84,11 @@ Implemented a reusable Prompt Playground capable of handling multiple business-o
 
 ---
 
-## ✅ Day 4 – Structured Outputs & Prompt Testing
+### ✅ Day 4 – Structured Outputs & Prompt Testing
 
 Implemented a production-style prompt evaluation framework.
 
-### Features
-
+**Features:**
 - Structured outputs using Pydantic
 - Response validation
 - JSON parsing
@@ -93,8 +100,7 @@ Implemented a production-style prompt evaluation framework.
 - Prompt reliability testing
 - Validation error reporting
 
-### Deliverables
-
+**Deliverables:**
 - Pydantic Output Models
 - Prompt Dataset
 - Prompt Test Harness
@@ -103,11 +109,92 @@ Implemented a production-style prompt evaluation framework.
 
 ---
 
-# Project Structure
+### ✅ Day 5 – Document Preprocessing & Chunking
 
-```text
+Prepared documents for the Retrieval-Augmented Generation pipeline.
+
+**Features:**
+- Document preprocessing
+- Front matter removal
+- Text cleaning
+- Markdown section handling
+- Document chunking
+- Chunk overlap
+- Chunk metadata generation
+- JSONL chunk dataset
+
+**Results:**
+- 30 documents processed
+- 47 chunks generated
+- Chunk metadata preserved
+- Chunking output stored in `results/chunks.jsonl`
+
+---
+
+### ✅ Day 6 – Vector Indexing & Semantic Search
+
+Implemented the first working vector retrieval pipeline.
+
+**Features:**
+- Sentence Transformer embeddings
+- `all-MiniLM-L6-v2` embedding model
+- 384-dimensional vectors
+- Batch embedding generation
+- Cached embedding model
+- Same embedding model for documents and queries
+- ChromaDB vector database
+- Persistent vector collection
+- Chunk text storage
+- Metadata storage
+- Content hash tracking
+- Embedding model tracking
+- Repeatable vector index creation
+- Top-K semantic search
+- Similarity scores
+- Metadata filtering
+- Minimum score threshold
+- 10-question retrieval evaluation
+- Retrieval result report
+
+**Day 6 Dataset:**
+- 15 selected documents
+- 26 selected chunks
+- 26 chunks successfully indexed
+
+**Retrieval Evaluation:**
+```
+Total Questions: 10
+Passed: 10
+Failed: 0
+Top-3 Retrieval Accuracy: 100%
+```
+
+**Day 6 Completion Gate:**
+- [x] Embeddings generated successfully
+- [x] Same embedding model used for documents and queries
+- [x] 384-dimensional vectors verified
+- [x] ChromaDB vector collection created
+- [x] 26 chunks indexed
+- [x] Chunk text and metadata stored
+- [x] Top-K semantic search implemented
+- [x] Similarity scores returned
+- [x] Metadata filtering implemented
+- [x] Minimum score threshold implemented
+- [x] Retrieval test dataset created
+- [x] 10 retrieval questions evaluated
+- [x] Top-3 retrieval evaluation completed
+- [x] 10/10 tests passed
+- [x] Retrieval result report generated
+- [x] Successful retrieval examples documented
+- [x] Weak retrieval example documented
+
+---
+
+## 📁 Project Structure
+
+```
 genai-assistant/
-│
+
 ├── app/
 │   ├── api/
 │   ├── core/
@@ -115,11 +202,15 @@ genai-assistant/
 │   ├── llm/
 │   ├── models/
 │   ├── rag/
+│   │   ├── embeddings.py
+│   │   ├── vector_store.py
+│   │   └── retrieve.py
 │   ├── safety/
 │   └── voice/
 │
 ├── datasets/
-│   └── prompt_test_cases.json
+│   ├── prompt_test_cases.json
+│   └── day6_retrieval_test_cases.json
 │
 ├── prompts/
 │   ├── summarization.txt
@@ -129,104 +220,84 @@ genai-assistant/
 │   └── classification.txt
 │
 ├── results/
-│   ├── prompt_test_results_v1.json
-│   └── prompt_test_results_v2.json
+│   ├── chunks.jsonl
+│   ├── day6_retrieval_report.json
+│   └── chroma_db/
 │
 ├── sample_data/
-│
-├── sample_inputs/
-│   ├── summarization/
-│   ├── extraction/
-│   └── classification/
-│
-├── sample_outputs/
-│   ├── summarization/
-│   ├── extraction/
-│   └── classification/
+│   └── day5_documents/
 │
 ├── scripts/
+│   ├── preprocess_documents.py
+│   ├── build_vector_index.py
+│   └── run_retrieval_tests.py
 │
 ├── tests/
 │
 ├── .env.example
-├── PROMPT_COMPARISON.md
 ├── README.md
 └── requirements.txt
 ```
 
 ---
 
-# Technology Stack
+## 🛠️ Technology Stack
 
-## Programming Language
-
+**Programming Language:**
 - Python 3.11
 
-## AI
-
+**AI / LLM:**
 - OpenRouter API
 - OpenAI Python SDK
 
-## Database
+**Embeddings:**
+- Sentence Transformers
+- all-MiniLM-L6-v2
+- 384-dimensional embeddings
 
+**Vector Database:**
+- ChromaDB
+
+**Database:**
 - SQLite
 - SQLAlchemy
 
-## Validation
-
+**Validation:**
 - Pydantic
 
-## Testing
-
+**Testing:**
 - Pytest
 
-## Environment
-
+**Environment:**
 - python-dotenv
 
-## Version Control
-
+**Version Control:**
 - Git
 - GitHub
 
 ---
 
-# Installation
+## 📦 Installation
 
-## Clone Repository
-
-```bash
-git clone <repository-url>
-cd genai-assistant
-```
-
----
-
-## Create Virtual Environment
+### Create Virtual Environment
 
 ```bash
 python -m venv .venv
 ```
 
----
+### Activate Virtual Environment
 
-## Activate Virtual Environment
-
-### Windows
-
+**Windows:**
 ```bash
 .venv\Scripts\activate
 ```
 
-### Linux / macOS
-
+**Linux / macOS:**
 ```bash
 source .venv/bin/activate
 ```
 
----
-
-## Install Dependencies
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -234,211 +305,218 @@ pip install -r requirements.txt
 
 ---
 
-## Configure Environment Variables
+## 🔧 Usage & Testing
 
-Create a `.env` file in the project root.
+### Day 6 – Build Vector Index
 
-Example:
-
-```env
-OPENROUTER_API_KEY=your_openrouter_api_key
-
-OPENROUTER_MODEL=google/gemma-4-26b-a4b-it:free
-
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-
-DATABASE_URL=sqlite:///genai.db
-```
-
----
-
-## Verify OpenRouter Connection
+After the Day 5 chunking process is completed, build the vector index using:
 
 ```bash
-python -m scripts.test_openrouter
+python -m scripts.build_vector_index
+```
+
+**Expected output:**
+```
+Selected chunks: 26
+Chunks embedded: 26
+Chunks skipped: 0
+Total indexed chunks: 26
 ```
 
 ---
 
-## Test Shared LLM Client
+### Verify Vector Database
+
+Run:
+```bash
+python -c "from app.rag.vector_store import get_collection, get_collection_count; collection=get_collection(); print('Collection:', collection.name); print('Count:', get_collection_count())"
+```
+
+**Expected:**
+```
+Collection: day6_chunks
+Count: 26
+```
+
+---
+
+### Verify Embedding Dimension
+
+Run:
+```bash
+python -c "from app.rag.embeddings import get_embedding_dimension; print('Embedding dimension:', get_embedding_dimension())"
+```
+
+**Expected:**
+```
+Embedding dimension: 384
+```
+
+---
+
+### Test Semantic Search
+
+Run:
+```bash
+python -c "from app.rag.retrieve import retrieve_documents; results=retrieve_documents('What is a Python variable?'); print('Results:', len(results)); [print(r) for r in results]"
+```
+
+The retrieval system returns:
+- Chunk ID
+- Document ID
+- Text
+- Title
+- Similarity score
+- Source path
+- Metadata
+
+---
+
+### Metadata Filtering
+
+Metadata filtering can be tested using:
 
 ```bash
-python -m scripts.test_client
+python -c "from app.rag.retrieve import retrieve_documents; results=retrieve_documents('What is a Python variable?', top_k=3, where={'category':'python'}); print('Results:', len(results)); [print(r['document_id'], r['title'], r['score'], r['category']) for r in results]"
+```
+
+**Example:**
+```
+DOC001 Python Basics 0.8288 python
+DOC002 Python Functions 0.5284 python
+DOC004 Python Modules 0.5112 python
 ```
 
 ---
 
-## Create Database
+### Minimum Score Threshold
 
+The retrieval system supports a minimum score threshold.
+
+**Example:**
 ```bash
-python -m scripts.create_database
+python -c "from app.rag.retrieve import retrieve_documents; results=retrieve_documents('What is a Python variable?', top_k=3, min_score=0.6); print('Results:', len(results)); [print(r['document_id'], r['title'], r['score']) for r in results]"
+```
+
+**Example result:**
+```
+Results: 1
+DOC001 Python Basics 0.8288
 ```
 
 ---
 
-## Load Sample Documents
+### Retrieval Evaluation
 
+The Day 6 retrieval test dataset is stored in:
+```
+datasets/day6_retrieval_test_cases.json
+```
+
+The dataset contains:
+- 10 questions
+- Expected document IDs
+- Manually selected source documents
+
+Run the evaluation using:
 ```bash
-python -m scripts.load_documents sample_data/valid.json
+python -m scripts.run_retrieval_tests
+```
+
+**Expected final result:**
+```
+Passed: 10/10
+Failed: 0/10
+Report saved to: results\day6_retrieval_report.json
 ```
 
 ---
 
-## View Database
+### Retrieval Result Report
 
-```bash
-python -m scripts.view_database
+The generated report is stored at:
+```
+results/day6_retrieval_report.json
 ```
 
+The report contains:
+- Embedding model
+- Top-K value
+- Total test questions
+- Passed count
+- Failed count
+- Accuracy
+- Question
+- Expected document
+- Top-3 results
+- Similarity scores
+- Document IDs
+- Titles
+- Source paths
+- Chunk IDs
+- Metadata
+- PASS/FAIL result
+
 ---
 
-# Prompt Playground
+### Retrieval Examples
 
-The Prompt Playground provides a reusable interface for executing different AI tasks using prompt templates stored separately from the application logic.
+#### Successful Retrieval Example 1
 
-## Supported Tasks
-
-### 1. Text Summarization
-
-Generate concise summaries from input documents.
-
-```bash
-python -m scripts.prompt_playground summarization sample_inputs/summarization/normal.txt
+**Question:**
+```
+What is a Python variable?
 ```
 
----
-
-### 2. Information Extraction
-
-Extract structured information from documents into JSON format.
-
-```bash
-python -m scripts.prompt_playground extraction sample_inputs/extraction/normal.txt
+**Retrieved:**
+```
+DOC001 — Python Basics
+Score: 0.8288
 ```
 
+**Result:** ✅ PASS
+
 ---
 
-### 3. Text Classification
+#### Successful Retrieval Example 2
 
-Classify text into predefined categories.
-
-```bash
-python -m scripts.prompt_playground classification sample_inputs/classification/normal.txt
+**Question:**
+```
+What is machine learning?
 ```
 
----
-
-# Structured Output Validation
-
-The project validates every AI response using **Pydantic models** to ensure reliable and predictable outputs.
-
-## Output Models
-
-- SummaryOutput
-- ExtractionOutput
-- ClassificationOutput
-
-Validation includes:
-
-- JSON parsing
-- Schema validation
-- Required field validation
-- Data type validation
-- Error categorization
-
-Supported failure categories:
-
-- JSON_PARSE_ERROR
-- VALIDATION_ERROR
-- CONFIG_ERROR
-
----
-
-# Prompt Test Harness
-
-The Prompt Test Harness automatically evaluates prompts against a fixed dataset and validates the generated responses.
-
-## Features
-
-- Executes multiple prompt test cases
-- Measures model latency
-- Records prompt version
-- Records model version
-- Validates structured outputs
-- Generates machine-readable result files
-- Reports validation failures
-
----
-
-## Run Prompt Tests
-
-### Prompt Version 1
-
-```bash
-python -m scripts.run_prompt_tests --prompt-version v1
+**Expected document:**
+```
+DOC019
 ```
 
-### Prompt Version 2
+The retrieval system successfully returned the Artificial Intelligence Basics document containing the Machine Learning section.
 
-```bash
-python -m scripts.run_prompt_tests --prompt-version v2
+**Result:** ✅ PASS
+
+---
+
+#### Weak Retrieval Example
+
+**Question:**
+```
+Tell me something about programming.
 ```
 
----
+**Top results:**
+```
+DOC001 — Python Basics — 0.3595
+DOC019 — Artificial Intelligence Basics — 0.3355
+DOC019 — Artificial Intelligence Basics — 0.3239
+```
 
-# Prompt Test Dataset
+This is considered a weak retrieval example because the query is broad and the similarity scores are relatively low.
 
-The dataset includes representative scenarios for each supported task.
-
-Dataset Categories:
-
-- Normal
-- Long
-- Ambiguous
-- Incomplete
-
-Tasks Covered:
-
-- Summarization
-- Information Extraction
-- Classification
+This can be improved later using advanced RAG techniques such as query improvement, better chunking, reranking, and result diversification.
 
 ---
 
-# Prompt Version Comparison
-
-Two versions of the summarization prompt were evaluated using the same dataset.
-
-## Version 1
-
-- Summary under 100 words
-- Return valid JSON
-
-## Version 2
-
-- Summary under 80 words
-- Exactly 2–3 concise sentences
-- Return valid JSON
-
-## Results
-
-| Metric | Version 1 | Version 2 |
-|---------|-----------|-----------|
-| Total Test Cases | 10 | 10 |
-| Passed | 10 | 10 |
-| Failed | 0 | 0 |
-
-### Observation
-
-Both prompt versions successfully passed schema validation for all test cases.
-
-Version 2 produced shorter and more consistent summaries while preserving the important information from the source text.
-
-**Preferred Prompt:** Version 2
-
----
-
-# Automated Testing
+### Automated Testing
 
 Run all project tests:
 
@@ -448,87 +526,29 @@ python -m pytest
 
 ---
 
-# Sample Outputs
+## 📊 Current Progress
 
-Generated outputs are automatically saved to:
-
-```text
-sample_outputs/
-├── summarization/
-├── extraction/
-└── classification/
-```
-
-Prompt test results are saved to:
-
-```text
-results/
-├── prompt_test_results_v1.json
-└── prompt_test_results_v2.json
-```
+| Day | Feature | Status |
+|-----|---------|--------|
+| 1 | Project Foundation | ✅ Complete |
+| 2 | Data Validation & Storage | ✅ Complete |
+| 3 | Prompt Playground | ✅ Complete |
+| 4 | Structured Outputs & Prompt Testing | ✅ Complete |
+| 5 | Document Preprocessing & Chunking | ✅ Complete |
+| 6 | Vector Indexing & Semantic Search | ✅ Complete |
 
 ---
 
-# Current Progress
-
-## ✅ Day 1 – Project Foundation
-
-- Project setup
-- Modular architecture
-- Virtual environment
-- Dependency management
-- Git repository initialization
-
----
-
-## ✅ Day 2 – Data Validation & Storage
-
-- JSON document validation
-- CLI document loader
-- SQLite database integration
-- SQLAlchemy ORM
-- Processing event logging
-- Database viewer
-- Pytest automation
-
----
-
-## ✅ Day 3 – Prompt Playground
-
-- Shared LLM client
-- Prompt templates
-- Prompt execution pipeline
-- Summarization
-- Information extraction
-- Text classification
-- Sample inputs
-- Sample outputs
-- Latency measurement
-
----
-
-## ✅ Day 4 – Structured Outputs & Prompt Testing
-
-- Pydantic output models
-- JSON response validation
-- Prompt validation
-- Prompt test dataset
-- Prompt test runner
-- Machine-readable test results
-- Prompt version comparison
-- Structured output testing
-- Validation error reporting
-
----
-
-# Future Roadmap
+## 🗓️ Future Roadmap
 
 Upcoming features include:
 
 - Retrieval-Augmented Generation (RAG)
-- Embedding generation
-- Vector database integration
-- Semantic search
+- Query-to-context pipeline
+- LLM answer generation using retrieved chunks
+- Citation generation
+- Retrieval reranking
+- Advanced chunking strategies
 - FastAPI REST APIs
 - User authentication
 - Voice assistant integration
@@ -541,7 +561,7 @@ Upcoming features include:
 
 ---
 
-# Learning Outcomes
+## 📚 Learning Outcomes
 
 This project demonstrates practical experience with:
 
@@ -556,19 +576,29 @@ This project demonstrates practical experience with:
 - SQLite & SQLAlchemy
 - OpenRouter API Integration
 - Modular Software Design
+- Document Preprocessing
+- Text Chunking
+- Text Embeddings
+- Sentence Transformers
+- Vector Databases
+- ChromaDB
+- Semantic Search
+- Top-K Retrieval
+- Metadata Filtering
+- Retrieval Evaluation
+- RAG Foundations
 - Git & GitHub Workflow
 
 ---
 
-# Author
+## 👨‍💻 Author
 
 **Madhusudhana V C**
 
-GitHub:
-https://github.com/MadhusudhanaVC
+GitHub: https://github.com/MadhusudhanaVC
 
 ---
 
-# License
+## 📄 License
 
 This project is developed for learning, experimentation, and educational purposes as part of a structured AI Engineering roadmap.

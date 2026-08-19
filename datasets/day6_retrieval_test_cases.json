@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is a Python variable?",
+    "expected_document_id": "DOC001"
+  },
+  {
+    "question": "How are functions defined in Python?",
+    "expected_document_id": "DOC002"
+  },
+  {
+    "question": "How does Python handle exceptions?",
+    "expected_document_id": "DOC003"
+  },
+  {
+    "question": "What is a Python module?",
+    "expected_document_id": "DOC004"
+  },
+  {
+    "question": "What is a Python virtual environment?",
+    "expected_document_id": "DOC005"
+  },
+  {
+    "question": "What is Git used for?",
+    "expected_document_id": "DOC007"
+  },
+  {
+    "question": "What is a Git branch?",
+    "expected_document_id": "DOC008"
+  },
+  {
+    "question": "What causes a Git merge conflict?",
+    "expected_document_id": "DOC009"
+  },
+  {
+    "question": "What is a pull request?",
+    "expected_document_id": "DOC010"
+  },
+  {
+    "question": "What is machine learning?",
+    "expected_document_id": "DOC019"
+  }
+]
