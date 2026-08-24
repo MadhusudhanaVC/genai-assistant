@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from app.rag.embeddings import embed_query
 from app.rag.vector_store import get_collection
 
@@ -10,6 +12,8 @@ def retrieve_documents(
     top_k: int = DEFAULT_TOP_K,
     min_score: float | None = None,
     where: dict | None = None,
+    chroma_path: Path | None = None,
+    collection_name: str = "day6_chunks",
 ) -> list[dict]:
     if not query or not query.strip():
         raise ValueError("query cannot be empty")
@@ -19,11 +23,22 @@ def retrieve_documents(
 
     query_embedding = embed_query(query)
 
-    collection = get_collection()
+    if chroma_path is None:
+        collection = get_collection(
+            name=collection_name,
+        )
+    else:
+        collection = get_collection(
+            path=chroma_path,
+            name=collection_name,
+        )
+
+    if collection.count() == 0:
+        return []
 
     search_results = collection.query(
         query_embeddings=[query_embedding],
-        n_results=top_k,
+        n_results=min(top_k, collection.count()),
         where=where,
         include=[
             "documents",

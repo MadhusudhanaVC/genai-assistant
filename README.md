@@ -190,6 +190,153 @@ Top-3 Retrieval Accuracy: 100%
 
 ---
 
+### ✅ Day 7 – Baseline RAG Ingestion & Retrieval
+
+Connected document loading, chunking, embeddings, vector indexing, retrieval, and generation-ready context into one understandable RAG pipeline.
+
+**Features:**
+- Separate RAG ingestion module
+- Separate retrieval module
+- Generation-ready context preparation
+- Document ingestion command
+- Document cleaning and chunking
+- Batch embedding generation
+- ChromaDB vector indexing
+- Processing event logging
+- Re-ingestion handling
+- Content hash tracking
+- Embedding model tracking
+- Top-K semantic retrieval
+- Similarity scores
+- Metadata filtering
+- Minimum score threshold
+- Stable source labels
+- Duplicate chunk removal
+- Context size limits
+- Integration testing
+- Failed-document isolation
+
+**Day 7 Ingestion:**
+```
+Documents processed: 30
+Documents completed: 30
+Documents failed: 0
+Chunks processed: 47
+Indexed chunks: 47
+
+Re-ingestion Verification:
+
+The approved document set was ingested twice.
+
+First ingestion:
+47 indexed chunks
+
+Second ingestion:
+47 indexed chunks
+
+The indexed chunk count remained 47, confirming that re-ingestion does not create uncontrolled duplicate chunks.
+
+Processing Events:
+
+STARTED / SUCCESS    219
+COMPLETED / SUCCESS  219
+FAILED / FAILED       2
+
+Processing events are persisted in SQLite, including successful and failed processing attempts. Failed documents are logged without stopping successful document processing. The two failed events shown here are accumulated from earlier runs and tests, not from the final successful 30-document ingestion.
+```
+
+**Retrieval Context Example:**
+
+**Question:**
+```
+What is a Python variable?
+```
+
+**Top result:**
+```
+DOC001_CHUNK_001 | DOC001 | Python Basics | score=0.8288
+```
+
+**Generation-ready source label:**
+```
+[DOC001 | DOC001_CHUNK_001]
+Title: Python Basics
+Source: sample_data\day5_documents\DOC001_python_basics.md
+```
+
+The context preparation step removes duplicate chunks and limits the final context by chunk count and character count.
+
+**Day 7 Integration Tests:**
+```
+test_ingest_then_retrieve                          PASSED
+test_failed_document_does_not_stop_other_documents PASSED
+
+2 passed
+```
+
+**Day 7 Commands:**
+
+Ingest the approved document set:
+```bash
+python -m scripts.ingest_documents
+```
+
+Display retrieval context:
+```bash
+python -m scripts.show_retrieval_context "What is a Python variable?"
+```
+
+Run Day 7 integration tests:
+```bash
+python.exe -m pytest tests/test_rag_pipeline.py -v
+```
+
+**Day 7 Completion Gate:**
+- [x] Full basic RAG flow is visible in code
+- [x] Separate ingestion, retrieval, and context modules implemented
+- [x] Approved document ingestion command created
+- [x] Re-ingestion does not create uncontrolled duplicate chunks
+- [x] Retrieved context includes stable source labels
+- [x] Integration tests pass
+- [x] Failed document handling verified
+- [x] Ingest-then-retrieve flow verified
+- [x] End-to-end document-to-context flow demonstrated
+
+**End-of-Day Evidence:**
+
+```
+Raw document
+    ↓
+Document cleaning
+    ↓
+Chunking
+    ↓
+Embedding generation
+    ↓
+ChromaDB vector storage
+    ↓
+Semantic retrieval
+    ↓
+Generation-ready context
+```
+
+**Example document:**
+```
+DOC001 — Python Basics
+```
+
+**Retrieved chunk:**
+```
+DOC001_CHUNK_001
+```
+
+**Retrieved source label:**
+```
+[DOC001 | DOC001_CHUNK_001]
+```
+
+---
+
 ## 📁 Project Structure
 
 ```
@@ -203,8 +350,10 @@ genai-assistant/
 │   ├── models/
 │   ├── rag/
 │   │   ├── embeddings.py
-│   │   ├── vector_store.py
-│   │   └── retrieve.py
+│   │   ├── generate.py
+│   │   ├── ingest.py
+│   │   ├── retrieve.py
+│   │   └── vector_store.py
 │   ├── safety/
 │   └── voice/
 │
@@ -228,11 +377,13 @@ genai-assistant/
 │   └── day5_documents/
 │
 ├── scripts/
-│   ├── preprocess_documents.py
 │   ├── build_vector_index.py
-│   └── run_retrieval_tests.py
+│   ├── ingest_documents.py
+│   ├── run_retrieval_tests.py
+│   └── show_retrieval_context.py
 │
 ├── tests/
+│   └── test_rag_pipeline.py
 │
 ├── .env.example
 ├── README.md
@@ -521,7 +672,7 @@ This can be improved later using advanced RAG techniques such as query improveme
 Run all project tests:
 
 ```bash
-python -m pytest
+python.exe -m pytest
 ```
 
 ---
@@ -536,6 +687,7 @@ python -m pytest
 | 4 | Structured Outputs & Prompt Testing | ✅ Complete |
 | 5 | Document Preprocessing & Chunking | ✅ Complete |
 | 6 | Vector Indexing & Semantic Search | ✅ Complete |
+| 7 | Baseline RAG Ingestion & Retrieval | ✅ Complete |
 
 ---
 
@@ -543,12 +695,11 @@ python -m pytest
 
 Upcoming features include:
 
-- Retrieval-Augmented Generation (RAG)
-- Query-to-context pipeline
-- LLM answer generation using retrieved chunks
-- Citation generation
+- Grounded generation with LLM answer generation using retrieved chunks
+- Citation generation from retrieved sources
 - Retrieval reranking
 - Advanced chunking strategies
+- Query optimization
 - FastAPI REST APIs
 - User authentication
 - Voice assistant integration

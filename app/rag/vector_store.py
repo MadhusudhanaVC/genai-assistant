@@ -7,19 +7,22 @@ CHROMA_PATH = Path("results/chroma_db")
 COLLECTION_NAME = "day6_chunks"
 
 
-def get_chroma_client():
-    CHROMA_PATH.mkdir(parents=True, exist_ok=True)
+def get_chroma_client(path: Path = CHROMA_PATH):
+    path.mkdir(parents=True, exist_ok=True)
 
     return chromadb.PersistentClient(
-        path=str(CHROMA_PATH)
+        path=str(path)
     )
 
 
-def get_collection():
-    client = get_chroma_client()
+def get_collection(
+    path: Path = CHROMA_PATH,
+    name: str = COLLECTION_NAME,
+):
+    client = get_chroma_client(path)
 
     return client.get_or_create_collection(
-        name=COLLECTION_NAME,
+        name=name,
         metadata={"hnsw:space": "cosine"},
     )
 
