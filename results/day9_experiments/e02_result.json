@@ -1,0 +1,69 @@
+{
+  "experiment": "E02",
+  "question_number": 7,
+  "variable_changed": "query_wording",
+  "hypothesis": "A more explicit branch-focused query may increase the separation between DOC008 and DOC007.",
+  "baseline": {
+    "query": "What is a Git branch?",
+    "top_k": 3,
+    "expected_document_id": "DOC008",
+    "expected_rank": 1,
+    "hit_at_1": true,
+    "hit_at_3": true,
+    "reciprocal_rank": 1.0
+  },
+  "experiment_configuration": {
+    "query": "What is a Git branch and how is it used for separate lines of development?",
+    "top_k": 3,
+    "min_score": null,
+    "metadata_filter": null
+  },
+  "experiment_result": {
+    "expected_document_id": "DOC008",
+    "expected_rank": 1,
+    "hit_at_1": true,
+    "hit_at_3": true,
+    "reciprocal_rank": 1.0,
+    "unique_document_count": 3,
+    "unique_documents": [
+      "DOC008",
+      "DOC007",
+      "DOC010"
+    ],
+    "chunks_per_document": {
+      "DOC008": 1,
+      "DOC007": 1,
+      "DOC010": 1
+    },
+    "expected_score": 0.7281,
+    "competitor_document_id": "DOC007",
+    "competitor_score": 0.6683,
+    "score_margin": 0.0598,
+    "retrieved_documents": [
+      {
+        "rank": 1,
+        "document_id": "DOC008",
+        "chunk_id": "DOC008_CHUNK_001",
+        "score": 0.7281,
+        "title": "Git Branches",
+        "source_path": "sample_data\\day5_documents\\DOC008_git_branches.md"
+      },
+      {
+        "rank": 2,
+        "document_id": "DOC007",
+        "chunk_id": "DOC007_CHUNK_001",
+        "score": 0.6683,
+        "title": "Git Basics",
+        "source_path": "sample_data\\day5_documents\\DOC007_git_basics.md"
+      },
+      {
+        "rank": 3,
+        "document_id": "DOC010",
+        "chunk_id": "DOC010_CHUNK_001",
+        "score": 0.5435,
+        "title": "Git Pull Requests",
+        "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md"
+      }
+    ]
+  }
+}

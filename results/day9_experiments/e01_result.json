@@ -1,0 +1,69 @@
+{
+  "experiment": "E01",
+  "question_number": 10,
+  "variable_changed": "query_wording",
+  "hypothesis": "A more explicit query may improve the ranking of DOC019 against the closely competing DOC020.",
+  "baseline": {
+    "query": "What is machine learning?",
+    "top_k": 3,
+    "expected_document_id": "DOC019",
+    "expected_rank": 2,
+    "hit_at_1": false,
+    "hit_at_3": true,
+    "reciprocal_rank": 0.5
+  },
+  "experiment_configuration": {
+    "query": "What is machine learning and how is it defined?",
+    "top_k": 3,
+    "min_score": null,
+    "metadata_filter": null
+  },
+  "experiment_result": {
+    "expected_document_id": "DOC019",
+    "expected_rank": 2,
+    "hit_at_1": false,
+    "hit_at_3": true,
+    "reciprocal_rank": 0.5,
+    "unique_document_count": 3,
+    "unique_documents": [
+      "DOC020",
+      "DOC019",
+      "DOC029"
+    ],
+    "chunks_per_document": {
+      "DOC020": 1,
+      "DOC019": 1,
+      "DOC029": 1
+    },
+    "expected_score": 0.6663,
+    "competitor_document_id": "DOC020",
+    "competitor_score": 0.6696,
+    "score_margin": -0.0033,
+    "retrieved_documents": [
+      {
+        "rank": 1,
+        "document_id": "DOC020",
+        "chunk_id": "DOC020_CHUNK_001",
+        "score": 0.6696,
+        "title": "Machine Learning Basics",
+        "source_path": "sample_data\\day5_documents\\DOC020_machine_learning_basics.md"
+      },
+      {
+        "rank": 2,
+        "document_id": "DOC019",
+        "chunk_id": "DOC019_CHUNK_002",
+        "score": 0.6663,
+        "title": "Artificial Intelligence Basics",
+        "source_path": "sample_data\\day5_documents\\DOC019_artificial_intelligence_basics.md"
+      },
+      {
+        "rank": 3,
+        "document_id": "DOC029",
+        "chunk_id": "DOC029_CHUNK_001",
+        "score": 0.4892,
+        "title": "Artificial Neural Networks",
+        "source_path": "sample_data\\day5_documents\\DOC029_ai_neural_networks.md"
+      }
+    ]
+  }
+}

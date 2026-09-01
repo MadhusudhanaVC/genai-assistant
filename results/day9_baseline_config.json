@@ -1,0 +1,35 @@
+{
+  "day": 9,
+  "purpose": "Frozen retrieval baseline before controlled experiments",
+  "embedding": {
+    "model": "all-MiniLM-L6-v2",
+    "normalization": true,
+    "dimension": 384
+  },
+  "chunking": {
+    "chunk_size": 500,
+    "chunk_overlap": 80
+  },
+  "retrieval": {
+    "top_k": 3,
+    "min_score": null,
+    "metadata_filter": null
+  },
+  "vector_store": {
+    "collection_name": "day6_chunks",
+    "chroma_path": "results/chroma_db"
+  },
+  "evaluation": {
+    "dataset": "datasets/day6_retrieval_test_cases.json",
+    "question_count": 10
+  },
+  "prompt": {
+    "file": "prompts/grounded_answer.txt",
+    "version": "current Day 8 grounded-answer template"
+  },
+  "baseline_metrics": {
+    "hit_at_1": 0.9,
+    "hit_at_3": 1.0,
+    "mrr": 0.95
+  }
+}

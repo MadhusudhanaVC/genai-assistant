@@ -1,0 +1,69 @@
+{
+  "experiment": "E03",
+  "question_number": 4,
+  "variable_changed": "query_wording",
+  "hypothesis": "A more explicit module-focused query may increase the separation between DOC004 and related Python documents.",
+  "baseline": {
+    "query": "What is a Python module?",
+    "top_k": 3,
+    "expected_document_id": "DOC004",
+    "expected_rank": 1,
+    "hit_at_1": true,
+    "hit_at_3": true,
+    "reciprocal_rank": 1.0
+  },
+  "experiment_configuration": {
+    "query": "What is a Python module and how is it used to organize Python code?",
+    "top_k": 3,
+    "min_score": null,
+    "metadata_filter": null
+  },
+  "experiment_result": {
+    "expected_document_id": "DOC004",
+    "expected_rank": 1,
+    "hit_at_1": true,
+    "hit_at_3": true,
+    "reciprocal_rank": 1.0,
+    "unique_document_count": 3,
+    "unique_documents": [
+      "DOC004",
+      "DOC001",
+      "DOC021"
+    ],
+    "chunks_per_document": {
+      "DOC004": 1,
+      "DOC001": 1,
+      "DOC021": 1
+    },
+    "expected_score": 0.7365,
+    "competitor_document_id": "DOC001",
+    "competitor_score": 0.597,
+    "score_margin": 0.1395,
+    "retrieved_documents": [
+      {
+        "rank": 1,
+        "document_id": "DOC004",
+        "chunk_id": "DOC004_CHUNK_001",
+        "score": 0.7365,
+        "title": "Python Modules",
+        "source_path": "sample_data\\day5_documents\\DOC004_python_modules.md"
+      },
+      {
+        "rank": 2,
+        "document_id": "DOC001",
+        "chunk_id": "DOC001_CHUNK_001",
+        "score": 0.597,
+        "title": "Python Basics",
+        "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md"
+      },
+      {
+        "rank": 3,
+        "document_id": "DOC021",
+        "chunk_id": "DOC021_CHUNK_001",
+        "score": 0.5342,
+        "title": "Python Classes",
+        "source_path": "sample_data\\day5_documents\\DOC021_python_classes.md"
+      }
+    ]
+  }
+}

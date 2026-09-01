@@ -1,0 +1,87 @@
+{
+  "experiment": "E04",
+  "question_number": 8,
+  "variable_changed": "top_k",
+  "hypothesis": "Increasing Top-K may reveal useful additional evidence beyond the baseline three retrieved chunks.",
+  "baseline": {
+    "query": "What causes a Git merge conflict?",
+    "top_k": 3,
+    "expected_document_id": "DOC009",
+    "expected_rank": 1,
+    "hit_at_1": true,
+    "hit_at_3": true,
+    "reciprocal_rank": 1.0
+  },
+  "experiment_configuration": {
+    "query": "What causes a Git merge conflict?",
+    "top_k": 5,
+    "min_score": null,
+    "metadata_filter": null
+  },
+  "experiment_result": {
+    "expected_document_id": "DOC009",
+    "expected_rank": 1,
+    "hit_at_1": true,
+    "hit_at_3": true,
+    "reciprocal_rank": 1.0,
+    "unique_document_count": 4,
+    "unique_documents": [
+      "DOC009",
+      "DOC012",
+      "DOC010",
+      "DOC007"
+    ],
+    "chunks_per_document": {
+      "DOC009": 2,
+      "DOC012": 1,
+      "DOC010": 1,
+      "DOC007": 1
+    },
+    "expected_score": 0.7784,
+    "competitor_document_id": "DOC012",
+    "competitor_score": 0.4453,
+    "score_margin": 0.3331,
+    "retrieved_documents": [
+      {
+        "rank": 1,
+        "document_id": "DOC009",
+        "chunk_id": "DOC009_CHUNK_001",
+        "score": 0.7784,
+        "title": "Git Merge Conflicts",
+        "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md"
+      },
+      {
+        "rank": 2,
+        "document_id": "DOC009",
+        "chunk_id": "DOC009_CHUNK_002",
+        "score": 0.6296,
+        "title": "Git Merge Conflicts",
+        "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md"
+      },
+      {
+        "rank": 3,
+        "document_id": "DOC012",
+        "chunk_id": "DOC012_CHUNK_002",
+        "score": 0.4453,
+        "title": "Git Commit Practices",
+        "source_path": "sample_data\\day5_documents\\DOC012_git_commit_practices.md"
+      },
+      {
+        "rank": 4,
+        "document_id": "DOC010",
+        "chunk_id": "DOC010_CHUNK_001",
+        "score": 0.4414,
+        "title": "Git Pull Requests",
+        "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md"
+      },
+      {
+        "rank": 5,
+        "document_id": "DOC007",
+        "chunk_id": "DOC007_CHUNK_001",
+        "score": 0.4316,
+        "title": "Git Basics",
+        "source_path": "sample_data\\day5_documents\\DOC007_git_basics.md"
+      }
+    ]
+  }
+}
