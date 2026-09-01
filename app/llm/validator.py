@@ -6,6 +6,7 @@ from app.models.prompt_outputs import (
     SummaryOutput,
     ExtractionOutput,
     ClassificationOutput,
+    GroundedAnswerOutput,
 )
 
 
@@ -53,10 +54,11 @@ def validate_response(task: str, response_text: str):
 
 
     model_map = {
-        "summarization": SummaryOutput,
-        "extraction": ExtractionOutput,
-        "classification": ClassificationOutput,
-    }
+    "summarization": SummaryOutput,
+    "extraction": ExtractionOutput,
+    "classification": ClassificationOutput,
+    "grounded_answer": GroundedAnswerOutput,
+}
 
     model = model_map.get(task)
 

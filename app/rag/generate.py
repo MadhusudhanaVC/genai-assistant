@@ -1,5 +1,17 @@
+from pathlib import Path
+
+from app.llm.client import generate_response
+from app.llm.validator import validate_response
+from app.rag.retrieve import retrieve_documents
+
+
 DEFAULT_MAX_CONTEXT_CHUNKS = 3
 DEFAULT_MAX_CONTEXT_CHARACTERS = 6000
+
+ABSTENTION_MESSAGE = (
+    "I don't have enough evidence in the "
+    "provided documents to answer this question."
+)
 
 
 def prepare_context(
@@ -60,3 +72,117 @@ def prepare_context(
             break
 
     return "\n\n---\n\n".join(context_parts)
+
+
+def build_grounded_prompt(
+    question: str,
+    context: str,
+) -> str:
+    prompt_path = Path("prompts/grounded_answer.txt")
+
+    prompt_template = prompt_path.read_text(
+        encoding="utf-8"
+    )
+
+    return prompt_template.format(
+        question=question,
+        context=context,
+    )
+
+
+def validate_citations(
+    citations: list[str],
+    results: list[dict],
+) -> list[str]:
+    valid_citations = {
+        f"[{result.get('document_id')} | {result.get('chunk_id')}]"
+        for result in results
+        if result.get("document_id") and result.get("chunk_id")
+    }
+
+    return [
+        citation
+        for citation in citations
+        if citation in valid_citations
+    ]
+
+
+def build_grounded_result(
+    answer: str,
+    status: str,
+    citations: list[str],
+    results: list[dict],
+) -> dict:
+    validated_citations = validate_citations(
+        citations=citations,
+        results=results,
+    )
+
+    if status == "answered" and not validated_citations:
+        status = "insufficient_evidence"
+        answer = ABSTENTION_MESSAGE
+
+    if status == "insufficient_evidence":
+        validated_citations = []
+
+    return {
+        "answer": answer,
+        "status": status,
+        "citations": validated_citations,
+        "sources": results,
+    }
+
+
+def generate_grounded_answer(
+    question: str,
+    top_k: int = 3,
+    min_score: float | None = None,
+    max_chunks: int = DEFAULT_MAX_CONTEXT_CHUNKS,
+    max_characters: int = DEFAULT_MAX_CONTEXT_CHARACTERS,
+) -> dict:
+    if not question or not question.strip():
+        raise ValueError("question cannot be empty")
+
+    results = retrieve_documents(
+        query=question,
+        top_k=top_k,
+        min_score=min_score,
+    )
+
+    context = prepare_context(
+        results,
+        max_chunks=max_chunks,
+        max_characters=max_characters,
+    )
+
+    if not context:
+        return {
+            "answer": ABSTENTION_MESSAGE,
+            "status": "insufficient_evidence",
+            "citations": [],
+            "sources": [],
+        }
+
+    prompt = build_grounded_prompt(
+        question=question,
+        context=context,
+    )
+
+    response = generate_response(prompt)
+
+    is_valid, validated, error = validate_response(
+        "grounded_answer",
+        response["text"],
+    )
+
+    if not is_valid:
+        raise ValueError(
+            f"Invalid grounded answer response: {error}"
+        )
+
+    return build_grounded_result(
+        answer=validated.answer,
+        status=validated.status,
+        citations=validated.citations,
+        results=results,
+    )

@@ -39,3 +39,26 @@ class ClassificationOutput(BaseModel):
         min_length=1,
         description="Short explanation"
     )
+
+
+
+
+
+
+class GroundedAnswerOutput(BaseModel):
+
+    answer: str = Field(
+        ...,
+        min_length=1,
+        description="Grounded answer generated from the provided context"
+    )
+
+    status: Literal[
+        "answered",
+        "insufficient_evidence",
+    ]
+
+    citations: list[str] = Field(
+        default_factory=list,
+        description="Source chunk labels cited by the answer"
+    )
