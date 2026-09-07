@@ -1,0 +1,482 @@
+{
+  "evaluation": "Day 10 reranker",
+  "configuration": {
+    "rewriter": "app.rag.query_rewriter.rewrite_query",
+    "initial_top_k": 5,
+    "final_top_k": 3,
+    "min_score": null,
+    "metadata_filter": null,
+    "reranker_model": "cross-encoder/ms-marco-MiniLM-L-6-v2"
+  },
+  "metrics": {
+    "total_questions": 10,
+    "hit_at_1": 1.0,
+    "hit_at_3": 1.0,
+    "mrr": 1.0,
+    "average_retrieval_latency_ms": 2904.11,
+    "average_reranking_latency_ms": 1411.33,
+    "average_total_latency_ms": 4315.45
+  },
+  "question_results": [
+    {
+      "question_number": 1,
+      "question": "What is a Python variable?",
+      "retrieval_query": "What is a Python variable and what does it store?",
+      "rewritten": true,
+      "expected_document_id": "DOC001",
+      "expected_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 27008.52,
+      "reranking_latency_ms": 6941.69,
+      "total_latency_ms": 33950.21,
+      "retrieved_documents": [
+        {
+          "rank": 1,
+          "original_rank": 1,
+          "document_id": "DOC001",
+          "chunk_id": "DOC001_CHUNK_001",
+          "original_score": 0.782,
+          "rerank_score": 7.2257,
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md"
+        },
+        {
+          "rank": 2,
+          "original_rank": 3,
+          "document_id": "DOC002",
+          "chunk_id": "DOC002_CHUNK_001",
+          "original_score": 0.4854,
+          "rerank_score": -0.9045,
+          "title": "Python Functions",
+          "source_path": "sample_data\\day5_documents\\DOC002_python_functions.md"
+        },
+        {
+          "rank": 3,
+          "original_rank": 2,
+          "document_id": "DOC004",
+          "chunk_id": "DOC004_CHUNK_001",
+          "original_score": 0.499,
+          "rerank_score": -1.6969,
+          "title": "Python Modules",
+          "source_path": "sample_data\\day5_documents\\DOC004_python_modules.md"
+        }
+      ]
+    },
+    {
+      "question_number": 2,
+      "question": "How are functions defined in Python?",
+      "retrieval_query": "How are functions defined in Python?",
+      "rewritten": false,
+      "expected_document_id": "DOC002",
+      "expected_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 181.08,
+      "reranking_latency_ms": 520.85,
+      "total_latency_ms": 701.93,
+      "retrieved_documents": [
+        {
+          "rank": 1,
+          "original_rank": 1,
+          "document_id": "DOC002",
+          "chunk_id": "DOC002_CHUNK_001",
+          "original_score": 0.7781,
+          "rerank_score": 8.5455,
+          "title": "Python Functions",
+          "source_path": "sample_data\\day5_documents\\DOC002_python_functions.md"
+        },
+        {
+          "rank": 2,
+          "original_rank": 2,
+          "document_id": "DOC001",
+          "chunk_id": "DOC001_CHUNK_001",
+          "original_score": 0.5262,
+          "rerank_score": 1.4157,
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md"
+        },
+        {
+          "rank": 3,
+          "original_rank": 5,
+          "document_id": "DOC021",
+          "chunk_id": "DOC021_CHUNK_001",
+          "original_score": 0.4275,
+          "rerank_score": -0.4183,
+          "title": "Python Classes",
+          "source_path": "sample_data\\day5_documents\\DOC021_python_classes.md"
+        }
+      ]
+    },
+    {
+      "question_number": 3,
+      "question": "How does Python handle exceptions?",
+      "retrieval_query": "How does Python handle exceptions?",
+      "rewritten": false,
+      "expected_document_id": "DOC003",
+      "expected_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 221.6,
+      "reranking_latency_ms": 1118.13,
+      "total_latency_ms": 1339.73,
+      "retrieved_documents": [
+        {
+          "rank": 1,
+          "original_rank": 1,
+          "document_id": "DOC003",
+          "chunk_id": "DOC003_CHUNK_001",
+          "original_score": 0.7419,
+          "rerank_score": 9.037,
+          "title": "Python Exception Handling",
+          "source_path": "sample_data\\day5_documents\\DOC003_python_exception_handling.md"
+        },
+        {
+          "rank": 2,
+          "original_rank": 3,
+          "document_id": "DOC001",
+          "chunk_id": "DOC001_CHUNK_001",
+          "original_score": 0.4439,
+          "rerank_score": -3.183,
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md"
+        },
+        {
+          "rank": 3,
+          "original_rank": 2,
+          "document_id": "DOC006",
+          "chunk_id": "DOC006_CHUNK_001",
+          "original_score": 0.503,
+          "rerank_score": -5.6433,
+          "title": "Python Testing",
+          "source_path": "sample_data\\day5_documents\\DOC006_python_testing.md"
+        }
+      ]
+    },
+    {
+      "question_number": 4,
+      "question": "What is a Python module?",
+      "retrieval_query": "What is a Python module and how is it used to organize Python code?",
+      "rewritten": true,
+      "expected_document_id": "DOC004",
+      "expected_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 168.52,
+      "reranking_latency_ms": 422.6,
+      "total_latency_ms": 591.12,
+      "retrieved_documents": [
+        {
+          "rank": 1,
+          "original_rank": 1,
+          "document_id": "DOC004",
+          "chunk_id": "DOC004_CHUNK_001",
+          "original_score": 0.7365,
+          "rerank_score": 9.914,
+          "title": "Python Modules",
+          "source_path": "sample_data\\day5_documents\\DOC004_python_modules.md"
+        },
+        {
+          "rank": 2,
+          "original_rank": 2,
+          "document_id": "DOC001",
+          "chunk_id": "DOC001_CHUNK_001",
+          "original_score": 0.597,
+          "rerank_score": 3.0822,
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md"
+        },
+        {
+          "rank": 3,
+          "original_rank": 3,
+          "document_id": "DOC021",
+          "chunk_id": "DOC021_CHUNK_001",
+          "original_score": 0.5342,
+          "rerank_score": -0.1696,
+          "title": "Python Classes",
+          "source_path": "sample_data\\day5_documents\\DOC021_python_classes.md"
+        }
+      ]
+    },
+    {
+      "question_number": 5,
+      "question": "What is a Python virtual environment?",
+      "retrieval_query": "What is a Python virtual environment?",
+      "rewritten": false,
+      "expected_document_id": "DOC005",
+      "expected_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 116.71,
+      "reranking_latency_ms": 644.34,
+      "total_latency_ms": 761.05,
+      "retrieved_documents": [
+        {
+          "rank": 1,
+          "original_rank": 1,
+          "document_id": "DOC005",
+          "chunk_id": "DOC005_CHUNK_001",
+          "original_score": 0.7514,
+          "rerank_score": 9.264,
+          "title": "Python Virtual Environments",
+          "source_path": "sample_data\\day5_documents\\DOC005_python_virtual_environments.md"
+        },
+        {
+          "rank": 2,
+          "original_rank": 2,
+          "document_id": "DOC001",
+          "chunk_id": "DOC001_CHUNK_001",
+          "original_score": 0.5264,
+          "rerank_score": -0.5265,
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md"
+        },
+        {
+          "rank": 3,
+          "original_rank": 4,
+          "document_id": "DOC004",
+          "chunk_id": "DOC004_CHUNK_001",
+          "original_score": 0.4221,
+          "rerank_score": -3.2131,
+          "title": "Python Modules",
+          "source_path": "sample_data\\day5_documents\\DOC004_python_modules.md"
+        }
+      ]
+    },
+    {
+      "question_number": 6,
+      "question": "What is Git used for?",
+      "retrieval_query": "What is Git used for?",
+      "rewritten": false,
+      "expected_document_id": "DOC007",
+      "expected_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 143.43,
+      "reranking_latency_ms": 1102.52,
+      "total_latency_ms": 1245.95,
+      "retrieved_documents": [
+        {
+          "rank": 1,
+          "original_rank": 1,
+          "document_id": "DOC007",
+          "chunk_id": "DOC007_CHUNK_001",
+          "original_score": 0.7508,
+          "rerank_score": 8.0547,
+          "title": "Git Basics",
+          "source_path": "sample_data\\day5_documents\\DOC007_git_basics.md"
+        },
+        {
+          "rank": 2,
+          "original_rank": 5,
+          "document_id": "DOC025",
+          "chunk_id": "DOC025_CHUNK_001",
+          "original_score": 0.4636,
+          "rerank_score": 5.3937,
+          "title": "Git Tags",
+          "source_path": "sample_data\\day5_documents\\DOC025_git_tags.md"
+        },
+        {
+          "rank": 3,
+          "original_rank": 4,
+          "document_id": "DOC008",
+          "chunk_id": "DOC008_CHUNK_001",
+          "original_score": 0.4761,
+          "rerank_score": 1.6948,
+          "title": "Git Branches",
+          "source_path": "sample_data\\day5_documents\\DOC008_git_branches.md"
+        }
+      ]
+    },
+    {
+      "question_number": 7,
+      "question": "What is a Git branch?",
+      "retrieval_query": "What is a Git branch and how is it used for separate lines of development?",
+      "rewritten": true,
+      "expected_document_id": "DOC008",
+      "expected_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 194.2,
+      "reranking_latency_ms": 597.89,
+      "total_latency_ms": 792.09,
+      "retrieved_documents": [
+        {
+          "rank": 1,
+          "original_rank": 1,
+          "document_id": "DOC008",
+          "chunk_id": "DOC008_CHUNK_001",
+          "original_score": 0.7281,
+          "rerank_score": 7.9026,
+          "title": "Git Branches",
+          "source_path": "sample_data\\day5_documents\\DOC008_git_branches.md"
+        },
+        {
+          "rank": 2,
+          "original_rank": 2,
+          "document_id": "DOC007",
+          "chunk_id": "DOC007_CHUNK_001",
+          "original_score": 0.6683,
+          "rerank_score": 3.2668,
+          "title": "Git Basics",
+          "source_path": "sample_data\\day5_documents\\DOC007_git_basics.md"
+        },
+        {
+          "rank": 3,
+          "original_rank": 5,
+          "document_id": "DOC009",
+          "chunk_id": "DOC009_CHUNK_002",
+          "original_score": 0.4885,
+          "rerank_score": 1.4249,
+          "title": "Git Merge Conflicts",
+          "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md"
+        }
+      ]
+    },
+    {
+      "question_number": 8,
+      "question": "What causes a Git merge conflict?",
+      "retrieval_query": "What causes a Git merge conflict?",
+      "rewritten": false,
+      "expected_document_id": "DOC009",
+      "expected_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 155.98,
+      "reranking_latency_ms": 644.35,
+      "total_latency_ms": 800.33,
+      "retrieved_documents": [
+        {
+          "rank": 1,
+          "original_rank": 1,
+          "document_id": "DOC009",
+          "chunk_id": "DOC009_CHUNK_001",
+          "original_score": 0.7784,
+          "rerank_score": 8.2798,
+          "title": "Git Merge Conflicts",
+          "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md"
+        },
+        {
+          "rank": 2,
+          "original_rank": 2,
+          "document_id": "DOC009",
+          "chunk_id": "DOC009_CHUNK_002",
+          "original_score": 0.6296,
+          "rerank_score": -0.1848,
+          "title": "Git Merge Conflicts",
+          "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md"
+        },
+        {
+          "rank": 3,
+          "original_rank": 4,
+          "document_id": "DOC010",
+          "chunk_id": "DOC010_CHUNK_001",
+          "original_score": 0.4414,
+          "rerank_score": -5.6546,
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md"
+        }
+      ]
+    },
+    {
+      "question_number": 9,
+      "question": "What is a pull request?",
+      "retrieval_query": "What is a pull request?",
+      "rewritten": false,
+      "expected_document_id": "DOC010",
+      "expected_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 656.91,
+      "reranking_latency_ms": 1098.1,
+      "total_latency_ms": 1755.01,
+      "retrieved_documents": [
+        {
+          "rank": 1,
+          "original_rank": 1,
+          "document_id": "DOC010",
+          "chunk_id": "DOC010_CHUNK_001",
+          "original_score": 0.7265,
+          "rerank_score": 8.8054,
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md"
+        },
+        {
+          "rank": 2,
+          "original_rank": 2,
+          "document_id": "DOC010",
+          "chunk_id": "DOC010_CHUNK_003",
+          "original_score": 0.6508,
+          "rerank_score": 6.9607,
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md"
+        },
+        {
+          "rank": 3,
+          "original_rank": 3,
+          "document_id": "DOC010",
+          "chunk_id": "DOC010_CHUNK_002",
+          "original_score": 0.645,
+          "rerank_score": 6.394,
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md"
+        }
+      ]
+    },
+    {
+      "question_number": 10,
+      "question": "What is machine learning?",
+      "retrieval_query": "What is machine learning?",
+      "rewritten": false,
+      "expected_document_id": "DOC019",
+      "expected_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 194.17,
+      "reranking_latency_ms": 1022.87,
+      "total_latency_ms": 1217.04,
+      "retrieved_documents": [
+        {
+          "rank": 1,
+          "original_rank": 2,
+          "document_id": "DOC019",
+          "chunk_id": "DOC019_CHUNK_002",
+          "original_score": 0.71,
+          "rerank_score": 8.6017,
+          "title": "Artificial Intelligence Basics",
+          "source_path": "sample_data\\day5_documents\\DOC019_artificial_intelligence_basics.md"
+        },
+        {
+          "rank": 2,
+          "original_rank": 1,
+          "document_id": "DOC020",
+          "chunk_id": "DOC020_CHUNK_001",
+          "original_score": 0.7128,
+          "rerank_score": 7.5293,
+          "title": "Machine Learning Basics",
+          "source_path": "sample_data\\day5_documents\\DOC020_machine_learning_basics.md"
+        },
+        {
+          "rank": 3,
+          "original_rank": 5,
+          "document_id": "DOC020",
+          "chunk_id": "DOC020_CHUNK_003",
+          "original_score": 0.4295,
+          "rerank_score": 0.6476,
+          "title": "Machine Learning Basics",
+          "source_path": "sample_data\\day5_documents\\DOC020_machine_learning_basics.md"
+        }
+      ]
+    }
+  ]
+}

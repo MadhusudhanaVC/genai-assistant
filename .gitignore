@@ -43,3 +43,4 @@ build/
 
 # Local ChromaDB vector database
 results/chroma_db/
+results/chroma_db_day10_chunk400/

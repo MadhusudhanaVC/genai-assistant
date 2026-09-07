@@ -3,10 +3,13 @@ from pathlib import Path
 from app.llm.client import generate_response
 from app.llm.validator import validate_response
 from app.rag.retrieve import retrieve_documents
+from app.rag.query_rewriter import rewrite_query
+from app.rag.reranker import rerank_documents
 
 
 DEFAULT_MAX_CONTEXT_CHUNKS = 3
 DEFAULT_MAX_CONTEXT_CHARACTERS = 6000
+DEFAULT_INITIAL_RETRIEVAL_K = 5
 
 ABSTENTION_MESSAGE = (
     "I don't have enough evidence in the "
@@ -143,14 +146,37 @@ def generate_grounded_answer(
     if not question or not question.strip():
         raise ValueError("question cannot be empty")
 
-    results = retrieve_documents(
-        query=question,
-        top_k=top_k,
+    retrieval_query = rewrite_query(question)
+
+    retrieved_documents = retrieve_documents(
+        query=retrieval_query,
+        top_k=max(top_k, DEFAULT_INITIAL_RETRIEVAL_K),
         min_score=min_score,
     )
 
+    if len(retrieved_documents) > 1:
+        results = rerank_documents(
+            question=question,
+            documents=retrieved_documents,
+            top_k=top_k,
+        )
+    else:
+        results = retrieved_documents
+
+    clean_results = []
+
+    for result in results:
+        clean_result = result.copy()
+
+        clean_result.pop("original_rank", None)
+        clean_result.pop("original_score", None)
+        clean_result.pop("rerank_score", None)
+        clean_result.pop("rank", None)
+
+        clean_results.append(clean_result)
+
     context = prepare_context(
-        results,
+        clean_results,
         max_chunks=max_chunks,
         max_characters=max_characters,
     )
@@ -184,5 +210,5 @@ def generate_grounded_answer(
         answer=validated.answer,
         status=validated.status,
         citations=validated.citations,
-        results=results,
+        results=clean_results,
     )
