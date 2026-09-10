@@ -20,6 +20,14 @@ def save_document(db: Session, document):
         raise
 
 
+def get_document(db: Session, document_id: str):
+    return (
+        db.query(Document)
+        .filter(Document.document_id == document_id)
+        .first()
+    )
+
+
 def log_event(
     db: Session,
     document_id: str,

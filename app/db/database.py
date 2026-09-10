@@ -9,6 +9,9 @@ from sqlalchemy.orm import declarative_base
 
 
 
+from app.core.config import settings
+
+
 # SQLite database file.
 # It will automatically be created in the project root.
 DATABASE_URL = "sqlite:///genai.db"
@@ -35,12 +38,7 @@ Base = declarative_base()
 
 
 def get_db():
-    """
-    Creates a new database session.
 
-    Returns:
-        SQLAlchemy Session
-    """
     db = SessionLocal()
 
     try:
