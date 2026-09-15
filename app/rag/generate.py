@@ -10,10 +10,9 @@ from app.rag.reranker import rerank_documents
 DEFAULT_MAX_CONTEXT_CHUNKS = 3
 DEFAULT_MAX_CONTEXT_CHARACTERS = 6000
 DEFAULT_INITIAL_RETRIEVAL_K = 5
-
+PROMPT_VERSION = "v1"
 ABSTENTION_MESSAGE = (
-    "I don't have enough evidence in the "
-    "provided documents to answer this question."
+    "There is not enough evidence in the provided documents to answer this question."
 )
 
 
@@ -142,17 +141,29 @@ def generate_grounded_answer(
     min_score: float | None = None,
     max_chunks: int = DEFAULT_MAX_CONTEXT_CHUNKS,
     max_characters: int = DEFAULT_MAX_CONTEXT_CHARACTERS,
+    stage_logger=None,
 ) -> dict:
     if not question or not question.strip():
         raise ValueError("question cannot be empty")
 
     retrieval_query = rewrite_query(question)
 
-    retrieved_documents = retrieve_documents(
-        query=retrieval_query,
-        top_k=max(top_k, DEFAULT_INITIAL_RETRIEVAL_K),
-        min_score=min_score,
-    )
+    if stage_logger:
+        stage_logger("RETRIEVAL", "STARTED")
+
+    try:
+        retrieved_documents = retrieve_documents(
+            query=retrieval_query,
+            top_k=max(top_k, DEFAULT_INITIAL_RETRIEVAL_K),
+            min_score=min_score,
+        )
+    except Exception:
+        if stage_logger:
+            stage_logger("RETRIEVAL", "FAILED")
+        raise
+
+    if stage_logger:
+        stage_logger("RETRIEVAL", "SUCCESS")
 
     if len(retrieved_documents) > 1:
         results = rerank_documents(
@@ -194,17 +205,29 @@ def generate_grounded_answer(
         context=context,
     )
 
-    response = generate_response(prompt)
+    if stage_logger:
+        stage_logger("GENERATION", "STARTED")
 
-    is_valid, validated, error = validate_response(
-        "grounded_answer",
-        response["text"],
-    )
+    try:
+        response = generate_response(prompt)
 
-    if not is_valid:
-        raise ValueError(
-            f"Invalid grounded answer response: {error}"
+        is_valid, validated, error = validate_response(
+            "grounded_answer",
+            response["text"],
         )
+
+        if not is_valid:
+            raise ValueError(
+                f"Invalid grounded answer response: {error}"
+            )
+
+    except Exception:
+        if stage_logger:
+            stage_logger("GENERATION", "FAILED")
+        raise
+
+    if stage_logger:
+        stage_logger("GENERATION", "SUCCESS")
 
     return build_grounded_result(
         answer=validated.answer,

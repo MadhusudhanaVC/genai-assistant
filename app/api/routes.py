@@ -1,7 +1,11 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from sqlalchemy.orm import Session
 
-from app.db.crud import get_document
+from app.db.crud import (
+    get_document,
+    log_request_source,
+    log_request_stage,
+)
 from app.db.database import get_db
 from app.models.api import (
     AskRequest,
@@ -19,12 +23,39 @@ def register_routes(app: FastAPI):
         return {"status": "healthy"}
 
     @app.post("/ask", response_model=AskResponse)
-    def ask(request: AskRequest):
+    def ask(
+        request: Request,
+        body: AskRequest,
+        db: Session = Depends(get_db),
+    ):
+        request_id = request.state.request_id
+
+        def stage_logger(stage: str, status: str):
+            log_request_stage(
+                db=db,
+                request_id=request_id,
+                stage=stage,
+                status=status,
+            )
+
         result = generate_grounded_answer(
-            question=request.question,
-            top_k=request.top_k,
-            min_score=request.min_score,
+            question=body.question,
+            top_k=body.top_k,
+            min_score=body.min_score,
+            stage_logger=stage_logger,
         )
+
+        for source in result.get("sources", []):
+            source_id = source.get("chunk_id")
+            score = source.get("score")
+
+            if source_id:
+                log_request_source(
+                    db=db,
+                    request_id=request_id,
+                    source_id=source_id,
+                    score=score,
+                )
 
         return result
 
@@ -63,6 +94,4 @@ def register_routes(app: FastAPI):
             "source_path": document.source_path,
             "updated_at": document.updated_at,
             "status": "completed",
-        } 
-
-        
+        }

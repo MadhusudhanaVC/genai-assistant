@@ -9,13 +9,14 @@ Rules:
 4. For every factual answer, include the exact source label from the context.
 5. Only cite source labels that are actually present in the provided context.
 6. If the context does not contain enough information to answer the question, do not guess.
-7. When the evidence is insufficient, return status as "insufficient_evidence".
+7. When the evidence is insufficient, set status to "insufficient_evidence" and use this exact answer:
+"There is not enough evidence in the provided documents to answer this question."
 8. Return ONLY valid JSON.
 
 Expected JSON format:
 
 {{
-    "answer": "",
+    "answer": "Your answer based only on the provided context.",
     "status": "answered",
     "citations": []
 }}

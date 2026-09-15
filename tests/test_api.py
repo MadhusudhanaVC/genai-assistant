@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.llm.client import ProviderError
 
 
 client = TestClient(app)
@@ -56,11 +57,21 @@ def test_document_not_found():
     response = client.get("/documents/UNKNOWN_DOCUMENT")
 
     assert response.status_code == 404
-    assert response.json() == {"detail": "Document not found"}
+
+    data = response.json()
+
+    assert data["error_code"] == "DOCUMENT_NOT_FOUND"
+    assert data["message"] == "The requested document was not found."
+    assert data["request_id"]
 
 
 def test_ask_success(monkeypatch):
-    def fake_generate_grounded_answer(question, top_k, min_score):
+    def fake_generate_grounded_answer(
+        question,
+        top_k,
+        min_score,
+        stage_logger=None,
+    ):
         return {
             "answer": "Python is a general-purpose programming language.",
             "status": "answered",
@@ -93,9 +104,85 @@ def test_ask_success(monkeypatch):
     data = response.json()
 
     assert data["status"] == "answered"
-    assert data["answer"] == "Python is a general-purpose programming language."
+    assert data["answer"] == (
+        "Python is a general-purpose programming language."
+    )
     assert data["citations"] == ["[DOC001 | DOC001_CHUNK_001]"]
     assert len(data["sources"]) == 1
+
+
+def test_ask_missing_evidence(monkeypatch):
+    def fake_generate_grounded_answer(
+        question,
+        top_k,
+        min_score,
+        stage_logger=None,
+    ):
+        return {
+            "answer": (
+                "There is not enough evidence in the provided "
+                "documents to answer this question."
+            ),
+            "status": "insufficient_evidence",
+            "citations": [],
+            "sources": [],
+        }
+
+    monkeypatch.setattr(
+        "app.api.routes.generate_grounded_answer",
+        fake_generate_grounded_answer,
+    )
+
+    response = client.post(
+        "/ask",
+        json={
+            "question": "What information is missing?",
+            "top_k": 3,
+            "min_score": None,
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["status"] == "insufficient_evidence"
+    assert data["citations"] == []
+    assert data["sources"] == []
+
+
+def test_ask_provider_failure(monkeypatch):
+    def fake_generate_grounded_answer(
+        question,
+        top_k,
+        min_score,
+        stage_logger=None,
+    ):
+        raise ProviderError("Simulated provider failure")
+
+    monkeypatch.setattr(
+        "app.api.routes.generate_grounded_answer",
+        fake_generate_grounded_answer,
+    )
+
+    response = client.post(
+        "/ask",
+        json={
+            "question": "What is RAG?",
+            "top_k": 3,
+            "min_score": None,
+        },
+    )
+
+    assert response.status_code == 502
+
+    data = response.json()
+
+    assert data["error_code"] == "PROVIDER_ERROR"
+    assert data["message"] == (
+        "The language model provider could not complete the request."
+    )
+    assert data["request_id"]
 
 
 def test_ingest_success(monkeypatch):

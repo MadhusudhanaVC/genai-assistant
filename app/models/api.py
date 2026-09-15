@@ -43,3 +43,9 @@ class DocumentResponse(BaseModel):
     source_path: str
     updated_at: str
     status: str
+
+
+class ErrorResponse(BaseModel):
+    error_code: str
+    message: str
+    request_id: str

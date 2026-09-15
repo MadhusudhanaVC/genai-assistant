@@ -1,7 +1,64 @@
 from sqlalchemy.orm import Session
 
-from app.db.models import Document, ProcessingEvent
+from app.db.models import (
+    APIRequest,
+    Document,
+    ProcessingEvent,
+    RequestSource,
+    RequestStage,
+)
 
+def update_api_request(
+    db: Session,
+    request_id: str,
+    total_latency_ms: int,
+    outcome: str,
+    error_category: str = None,
+):
+    request_log = (
+        db.query(APIRequest)
+        .filter(APIRequest.request_id == request_id)
+        .first()
+    )
+
+    if request_log is None:
+        raise ValueError(
+            f"API request not found: {request_id}"
+        )
+
+    request_log.total_latency_ms = total_latency_ms
+    request_log.outcome = outcome
+    request_log.error_category = error_category
+
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+def create_api_request(
+    db: Session,
+    request_id: str,
+    endpoint: str,
+    started_at,
+    model_version: str = None,
+    prompt_version: str = None,
+):
+    request_log = APIRequest(
+        request_id=request_id,
+        endpoint=endpoint,
+        started_at=started_at,
+        model_version=model_version,
+        prompt_version=prompt_version,
+        outcome="IN_PROGRESS",
+    )
+
+    try:
+        db.add(request_log)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
 def save_document(db: Session, document):
     db_document = Document(
@@ -44,6 +101,43 @@ def log_event(
 
     try:
         db.add(event)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+def log_request_source(
+    db: Session,
+    request_id: str,
+    source_id: str,
+    score: float = None,
+):
+    source_log = RequestSource(
+        request_id=request_id,
+        source_id=source_id,
+        score=score,
+    )
+
+    try:
+        db.add(source_log)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+def log_request_stage(
+    db: Session,
+    request_id: str,
+    stage: str,
+    status: str,
+):
+    stage_log = RequestStage(
+        request_id=request_id,
+        stage=stage,
+        status=status,
+    )
+
+    try:
+        db.add(stage_log)
         db.commit()
     except Exception:
         db.rollback()
