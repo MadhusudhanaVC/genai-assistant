@@ -1,665 +1,1208 @@
-Day 13 — Golden Set & Evaluation Runner
+# GenAI Assistant
 
-GenAI Engineering Roadmap · Day 13 Documentation
+A Retrieval-Augmented Generation (RAG) assistant built with Python.
 
-Day 13 focuses on building a representative golden evaluation dataset and a repeatable evaluation runner to measure the end-to-end quality of the RAG pipeline.
+The project demonstrates document ingestion, chunking, embeddings, vector retrieval, query rewriting, cross-encoder reranking, grounded answer generation, citation validation, database integration, FastAPI service contracts, SQL observability, structured error handling, and API testing.
 
-📌 Objectives
+---
 
-Create a reviewed golden evaluation dataset containing at least 25 cases.
+## Features
 
-Cover answerable, unanswerable, ambiguous, multi-document, and adversarial cases.
+- Document ingestion and processing
+- Text chunking
+- Sentence-transformer embeddings
+- ChromaDB vector search
+- Query rewriting
+- Cross-encoder reranking
+- Grounded answer generation
+- Citation validation
+- SQLAlchemy database integration
+- FastAPI REST API
+- Pydantic request and response validation
+- Swagger / OpenAPI documentation
+- Retrieval evaluation and regression testing
+- SQL request observability
+- Request ID tracking
+- Request stage logging
+- Source and retrieval score logging
+- Centralized API error handling
+- Provider error handling
 
-Define expected source mappings and answerability for each case.
+---
 
-Build a repeatable evaluation runner.
+## RAG Pipeline
 
-Capture answers, citations, retrieval results, status, latency, versions, configuration, and errors.
+```text
+Question
+   ↓
+Query Rewriting
+   ↓
+Vector Retrieval — Top 5
+   ↓
+Cross-Encoder Reranking
+   ↓
+Final Top 3
+   ↓
+Grounded Context
+   ↓
+LLM Answer
+   ↓
+Citation Validation
+```
 
-Generate timestamped, machine-readable result artifacts without overwriting previous runs.
+---
 
-📁 Project Structure
+# Day 10 — Advanced Retrieval
 
+Day 10 focused on improving retrieval quality through controlled experiments.
+
+## Final Configuration
+
+| Parameter | Value |
+|---|---|
+| Query rewriting | Enabled |
+| Initial retrieval | Top 5 |
+| Final results | Top 3 |
+| Chunk size | 500 |
+| Chunk overlap | 80 |
+| Embedding model | `all-MiniLM-L6-v2` |
+| Reranker | `cross-encoder/ms-marco-MiniLM-L-6-v2` |
+
+## Results
+
+| Metric | Day 9 | Day 10 |
+|---|---:|---:|
+| Hit@1 | 0.90 | 1.00 |
+| Hit@3 | 1.00 | 1.00 |
+| MRR | 0.95 | 1.00 |
+
+The main improvement came from cross-encoder reranking.
+
+## Q10 Improvement
+
+```text
+Before:
+DOC019 → Rank 2
+
+After:
+DOC019 → Rank 1
+```
+
+No regressions were detected during evaluation.
+
+---
+
+# Day 11 — FastAPI Service
+
+Day 11 exposes the existing RAG pipeline through a FastAPI service with validated request and response models.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/health` | Check service health |
+| POST | `/ingest` | Ingest documents |
+| POST | `/ask` | Ask a question using the RAG pipeline |
+| GET | `/documents/{document_id}` | Retrieve document metadata and content |
+
+## Run the API
+
+```bash
+uvicorn app.main:app --reload
+```
+
+API:
+
+```text
+http://127.0.0.1:8000
+```
+
+Swagger UI:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+OpenAPI:
+
+```text
+http://127.0.0.1:8000/openapi.json
+```
+
+---
+
+## API Examples
+
+### Health
+
+```text
+GET /health
+```
+
+Response:
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+### Ask
+
+```text
+POST /ask
+```
+
+Request:
+
+```json
+{
+  "question": "What is Python?",
+  "top_k": 3,
+  "min_score": null
+}
+```
+
+Response:
+
+```json
+{
+  "answer": "Python is a general-purpose programming language commonly used for automation, web applications, data processing, and scripting.",
+  "status": "answered",
+  "citations": [
+    "[DOC001 | DOC001_CHUNK_001]"
+  ],
+  "sources": [
+    {
+      "chunk_id": "DOC001_CHUNK_001",
+      "document_id": "DOC001",
+      "title": "Python Basics"
+    }
+  ]
+}
+```
+
+### Ingest
+
+```text
+POST /ingest
+```
+
+Example response:
+
+```json
+{
+  "processed_documents": 30,
+  "completed_documents": 30,
+  "failed_documents": 0,
+  "chunks": 47,
+  "indexed_chunks": 47,
+  "status": "completed"
+}
+```
+
+### Get Document
+
+```text
+GET /documents/DOC001
+```
+
+Example response:
+
+```json
+{
+  "document_id": "DOC001",
+  "title": "Python Basics",
+  "content": "...",
+  "source_path": "...",
+  "updated_at": "2026-08-10",
+  "status": "completed"
+}
+```
+
+Unknown documents return:
+
+```text
+404 Not Found
+```
+
+---
+
+## API Validation
+
+The API uses Pydantic models for request and response validation.
+
+### `AskRequest`
+
+| Field | Constraint |
+|---|---|
+| `question` | Required, minimum length: 1 |
+| `top_k` | Default: 3, minimum: 1 |
+| `min_score` | Optional, range: 0 to 1 |
+
+### Validation Behavior
+
+| Input | Response |
+|---|---:|
+| Empty question | 422 |
+| `top_k = 0` | 422 |
+| `min_score = 2` | 422 |
+| Valid request | 200 |
+
+---
+
+## Day 11 Testing
+
+The Day 11 API tests covered:
+
+- Health endpoint
+- `/ask` request validation
+- `/ask` successful response
+- `/ingest` successful response
+- Document not-found handling
+- Document retrieval response
+
+At the Day 11 checkpoint, the full project test suite contained:
+
+```text
+26 tests passed
+```
+
+After the Day 12 changes, the complete regression suite was expanded and verified with:
+
+```text
+28 tests passed
+```
+
+---
+
+# Day 12 — Observability and Error Handling
+
+Day 12 focuses on making the FastAPI service observable, diagnosable, and safer to operate while preserving the existing RAG architecture.
+
+---
+
+## SQL Observability
+
+The service records request-level information in three database tables:
+
+| Table | Purpose |
+|---|---|
+| `api_requests` | Request ID, endpoint, timing, model version, prompt version, outcome, and error category |
+| `request_sources` | Retrieved source/chunk IDs and retrieval scores |
+| `request_stages` | Major processing stages and their status |
+
+---
+
+## Request Metadata
+
+Each request records:
+
+- Request ID
+- Endpoint
+- Start time
+- Total latency in milliseconds
+- Model version
+- Prompt version
+- Outcome
+- Error category
+
+Request IDs are accepted from the `X-Request-ID` request header when supplied. Otherwise, the application generates a UUID.
+
+The request ID is returned through the `X-Request-ID` response header and is also included in structured error responses.
+
+---
+
+## Request Outcomes
+
+Requests can be recorded with the following outcomes:
+
+```text
+IN_PROGRESS
+SUCCESS
+ERROR
+```
+
+Error categories include:
+
+```text
+PROVIDER_ERROR
+INTERNAL_ERROR
+```
+
+---
+
+## Stage Logging
+
+The `/ask` RAG pipeline records major stages:
+
+```text
+RETRIEVAL
+    ↓
+GENERATION
+```
+
+Each stage can be recorded as:
+
+```text
+STARTED
+SUCCESS
+FAILED
+```
+
+A successful request is recorded as:
+
+```text
+RETRIEVAL  → STARTED
+RETRIEVAL  → SUCCESS
+GENERATION → STARTED
+GENERATION → SUCCESS
+```
+
+A generation failure is recorded as:
+
+```text
+RETRIEVAL  → STARTED
+RETRIEVAL  → SUCCESS
+GENERATION → STARTED
+GENERATION → FAILED
+```
+
+Stage logging is connected to the existing RAG pipeline through a stage logging callback.
+
+---
+
+## Source Logging
+
+Retrieved source IDs and retrieval scores are stored in `request_sources`.
+
+Example:
+
+```text
+DOC019_CHUNK_001 → 0.6434
+DOC029_CHUNK_001 → 0.5342
+DOC019_CHUNK_002 → 0.5945
+```
+
+The request observability records store source identifiers and scores rather than unnecessarily storing full generated responses or other restricted request data.
+
+---
+
+## Consistent Error Responses
+
+Centralized error handlers provide stable error codes and safe client-facing messages.
+
+| Error | HTTP Status | Error Code |
+|---|---:|---|
+| Invalid request | 422 | `VALIDATION_ERROR` |
+| Document not found | 404 | `DOCUMENT_NOT_FOUND` |
+| LLM provider failure | 502 | `PROVIDER_ERROR` |
+| Unexpected application failure | 500 | `INTERNAL_ERROR` |
+
+### Validation Error
+
+Example:
+
+```json
+{
+  "error_code": "VALIDATION_ERROR",
+  "message": "The request data is invalid.",
+  "request_id": "..."
+}
+```
+
+### Document Not Found
+
+Example:
+
+```json
+{
+  "error_code": "DOCUMENT_NOT_FOUND",
+  "message": "The requested document was not found.",
+  "request_id": "..."
+}
+```
+
+### Provider Error
+
+Example:
+
+```json
+{
+  "error_code": "PROVIDER_ERROR",
+  "message": "The language model provider could not complete the request.",
+  "request_id": "..."
+}
+```
+
+### Internal Error
+
+Unexpected application failures return:
+
+```text
+500 Internal Server Error
+```
+
+with the stable:
+
+```text
+INTERNAL_ERROR
+```
+
+error code and a safe client-facing message.
+
+Provider-specific details and internal stack traces are not returned to API clients.
+
+---
+
+## LLM Provider Handling
+
+The LLM client uses a dedicated `ProviderError` exception for provider failures and invalid provider responses.
+
+The client handles cases such as:
+
+- Provider request failure
+- Provider returning no choices
+- Provider returning an empty response
+
+The provider response is checked before the application attempts to access the generated message.
+
+This prevents unexpected provider responses from producing unhandled application errors.
+
+---
+
+## Blocking / Async Review
+
+Synchronous database logging inside the asynchronous request middleware is executed through:
+
+```python
+run_in_threadpool()
+```
+
+This ensures blocking SQL operations are not performed directly on the asynchronous event loop.
+
+The synchronous FastAPI routes continue to use the existing RAG, database, document, and LLM operations without duplicating application logic.
+
+---
+
+# Day 12 API Tests
+
+The Day 12 API test suite covers:
+
+- Health endpoint
+- Empty question validation
+- Invalid `top_k`
+- Invalid `min_score`
+- Unknown document handling
+- Successful `/ask`
+- Missing evidence handling
+- Provider failure handling
+- Successful `/ingest`
+- Successful document lookup
+
+Run the API tests with:
+
+```bash
+pytest tests/test_api.py -v
+```
+
+Final result:
+
+```text
+10 tests passed
+```
+
+---
+
+# Day 12 Regression Test
+
+The complete project test suite was rerun after the Day 12 changes.
+
+Run:
+
+```bash
+pytest -v
+```
+
+Final result:
+
+```text
+28 passed in 201.94s (0:03:21)
+```
+
+All existing tests passed after the Day 12 implementation.
+
+---
+
+# Manual Verification
+
+The `/ask` endpoint was manually verified with a successful grounded response.
+
+Example result:
+
+```text
+HTTP/1.1 200 OK
+```
+
+The response included:
+
+- Grounded answer
+- Citation
+- Source metadata
+- Retrieval scores
+- `X-Request-ID` response header
+
+Example request ID:
+
+```text
+b5fc92f9-6b75-448f-bee3-9cffb469a13b
+```
+
+The corresponding SQL observability record contained:
+
+```text
+Endpoint: /ask
+Outcome: SUCCESS
+Error category: None
+```
+
+Recorded stages:
+
+```text
+RETRIEVAL  → STARTED
+RETRIEVAL  → SUCCESS
+GENERATION → STARTED
+GENERATION → SUCCESS
+```
+
+Retrieved sources and scores were also recorded in the `request_sources` table.
+
+---
+
+## Provider Failure Verification
+
+A provider failure was manually tested.
+
+The API correctly returned:
+
+```text
+HTTP/1.1 502 Bad Gateway
+```
+
+with:
+
+```json
+{
+  "error_code": "PROVIDER_ERROR",
+  "message": "The language model provider could not complete the request.",
+  "request_id": "..."
+}
+```
+
+The request ID was returned in both the response body and the `X-Request-ID` response header.
+
+The corresponding request stages were recorded as:
+
+```text
+RETRIEVAL  → STARTED
+RETRIEVAL  → SUCCESS
+GENERATION → STARTED
+GENERATION → FAILED
+```
+
+This confirms that provider failures are handled separately from normal successful requests.
+
+---
+
+# Day 10 Retrieval Evaluation
+
+| Metric | Score |
+|---|---:|
+| Hit@1 | 1.00 |
+| Hit@3 | 1.00 |
+| MRR | 1.00 |
+
+---
+
+# Project Structure
+
+```text
 genai-assistant/
 │
 ├── app/
-│   └── ...                         # Existing RAG application
+│   ├── api/
+│   │   ├── errors.py
+│   │   └── routes.py
+│   │
+│   ├── core/
+│   │   └── config.py
+│   │
+│   ├── db/
+│   │   ├── crud.py
+│   │   ├── database.py
+│   │   └── models.py
+│   │
+│   ├── llm/
+│   │   ├── client.py
+│   │   └── validator.py
+│   │
+│   ├── middleware/
+│   │   └── request_logging.py
+│   │
+│   ├── models/
+│   │   ├── api.py
+│   │   ├── document.py
+│   │   └── prompt_outputs.py
+│   │
+│   ├── rag/
+│   │   ├── chunking.py
+│   │   ├── embeddings.py
+│   │   ├── generate.py
+│   │   ├── ingest.py
+│   │   ├── query_rewriter.py
+│   │   ├── reranker.py
+│   │   ├── retrieve.py
+│   │   └── vector_store.py
+│   │
+│   └── main.py
 │
 ├── datasets/
-│   ├── day6_retrieval_test_cases.json
-│   ├── prompt_test_cases.json
-│   └── golden_set.jsonl            # Day 13: 25 evaluation cases
-│
-├── docs/
-│   └── day13_golden_set_review.md  # Day 13: review documentation
-│
-├── evals/
-│   └── run_evals.py                # Day 13: evaluation runner
+│   └── day6_retrieval_test_cases.json
 │
 ├── prompts/
 │   └── grounded_answer.txt
 │
 ├── results/
-│   └── eval_runs/                  # Day 13: evaluation artifacts
-│       ├── eval_20260916T101937Z.json
-│       ├── eval_20260916T140012Z.json
-│       └── eval_20260917T082522Z.json
-│
-├── sample_data/
-│   └── day5_documents/             # Approved Day 5 corpus
-│       └── DOC001 ... DOC030
-│
-├── sample_inputs/
-├── sample_outputs/
-│
-├── scripts/
-│   └── validate_golden_set.py      # Day 13: dataset validator
+│   ├── chunks.jsonl
+│   ├── day9_baseline_metrics.json
+│   ├── day10_query_rewrite_results.json
+│   ├── day10_reranker_results.json
+│   ├── day10_before_after_report.json
+│   └── day10_experiments/
 │
 ├── tests/
-│   └── ...                         # Existing project tests
+│   ├── test_api.py
+│   ├── test_chunking.py
+│   ├── test_cli_loader.py
+│   ├── test_database.py
+│   ├── test_document_validation.py
+│   ├── test_grounded_generation.py
+│   └── test_rag_pipeline.py
 │
-├── test_citation_validation.py
-├── test_grounded_validator.py
-├── verify_day8.py
-│
-├── .env
 ├── .env.example
 ├── .gitignore
-├── genai.db
 ├── pytest.ini
 ├── pyproject.toml
 └── README.md
+```
+
+---
 
-Note: genai.db is the local runtime database and is not a Day 13 deliverable.
+# Main Components
 
-Day 13 Components
+| Component | Location |
+|---|---|
+| FastAPI application | `app/main.py` |
+| API routes | `app/api/routes.py` |
+| API error handlers | `app/api/errors.py` |
+| Request logging middleware | `app/middleware/request_logging.py` |
+| API models | `app/models/api.py` |
+| Configuration | `app/core/config.py` |
+| Database | `app/db/` |
+| LLM | `app/llm/` |
+| RAG pipeline | `app/rag/` |
+| Evaluation datasets | `datasets/` |
+| Prompts | `prompts/` |
+| Results | `results/` |
+| Tests | `tests/` |
+
+---
 
-Component
+# Testing
 
-Location
+The project includes tests for:
 
-Purpose
+- Grounded answer generation
+- Citation validation
+- Grounded response validation
+- Retrieval evaluation
+- API request validation
+- API endpoint behavior
+- Database functionality
+- Document validation
+- Text chunking
+- RAG pipeline behavior
+- Provider failure handling
+- Missing evidence handling
+- Document not-found handling
 
-🗂️ Golden Set
+---
 
-datasets/golden_set.jsonl
+# Configuration
 
-Stores the 25 evaluation cases
+The application uses environment variables for configuration.
 
-📝 Review Notes
+Create a local `.env` file based on `.env.example`.
 
-docs/day13_golden_set_review.md
+Example:
 
-Documents dataset review
+```env
+APP_NAME=GenAI Assistant
+APP_ENV=development
+DEBUG=True
 
-▶️ Evaluation Runner
+OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_MODEL=your_model
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+```
+
+Never commit real API keys or other secrets to Git.
+
+---
+
+# Git Ignore
+
+Generated local files and vector database files should not be committed.
+
+Examples:
 
-evals/run_evals.py
+```text
+.env
+genai.db
+results/chroma_db/
+results/chroma_db_day10_chunk400/
+```
 
-Runs all golden-set cases
+---
 
-✅ Validator
+# Project Status
 
-scripts/validate_golden_set.py
+| Day | Focus | Status |
+|---|---|---|
+| Day 1 | Project setup and configuration | ✅ Completed |
+| Day 2 | Document processing | ✅ Completed |
+| Day 3 | Embeddings and vector storage | ✅ Completed |
+| Day 4 | Retrieval pipeline | ✅ Completed |
+| Day 5 | RAG pipeline | ✅ Completed |
+| Day 6 | Database and persistence | ✅ Completed |
+| Day 7 | Safety and validation | ✅ Completed |
+| Day 8 | Voice capability | ✅ Completed |
+| Day 9 | Retrieval evaluation | ✅ Completed |
+| Day 10 | Advanced retrieval and reranking | ✅ Completed |
+| Day 11 | FastAPI service | ✅ Completed |
+| Day 12 | Observability, error handling, and API tests | ✅ Completed |
 
-Validates the golden set
+---
 
-📊 Result Artifacts
+# Day 10 Completion
 
-results/eval_runs/
+Day 10 advanced retrieval improvements were implemented and evaluated.
 
-Stores timestamped evaluation results
+Completed:
 
-1. 🗂️ Golden Evaluation Dataset
+- Query rewriting
+- Top-5 initial retrieval
+- Cross-encoder reranking
+- Final Top-3 selection
+- Retrieval evaluation
+- Regression testing
+- Q10 ranking improvement
 
-Dataset File
+Final metrics:
 
-datasets/golden_set.jsonl
+```text
+Hit@1: 1.00
+Hit@3: 1.00
+MRR:   1.00
+```
 
-The golden set contains 25 evaluation cases based on the approved Day 5 document corpus.
+---
 
-Evaluation Case Format
+# Day 11 Completion
 
-Each case contains:
+Day 11 FastAPI service implementation is complete.
 
-Field
+Completed:
 
-Description
+- FastAPI application created
+- `/health` endpoint implemented
+- `/ingest` endpoint implemented
+- `/ask` endpoint implemented
+- `/documents/{document_id}` endpoint implemented
+- Pydantic API models added
+- Database dependency injection added
+- Document lookup added to CRUD layer
+- Swagger / OpenAPI documentation verified
+- API validation tested
 
-case_id
+---
 
-Unique evaluation case ID
+# Day 12 Completion
 
-question
+Day 12 SQL observability, structured error handling, blocking/async review, and API regression testing are complete.
 
-Question being evaluated
+Completed:
 
-category
+- SQL request logging added
+- Request ID generation and propagation added
+- Request latency tracking added
+- Model and prompt version tracking added
+- Request outcome and error category tracking added
+- Retrieval source and score logging added
+- Retrieval and generation stage logging added
+- Centralized API error handlers added
+- Provider error handling added
+- Safe error response contracts added
+- Blocking database logging moved through `run_in_threadpool()`
+- API test suite updated and verified
+- 10 API tests passed
+- 28 full regression tests passed
+- Manual `/ask` success verified
+- Provider failure path verified
+- SQL observability verified
 
-Evaluation category
+---
 
-expected_source_ids
+# Quick Start
 
-Expected supporting source IDs
+## 1. Install dependencies
 
-answerability
+```bash
+pip install -r requirements.txt
+```
 
-Expected answerability
+## 2. Set up environment
 
-Optional expected facts / answer notes
+Copy `.env.example` to `.env` and add your OpenRouter API key.
 
-Additional evaluation guidance
+## 3. Run the API
 
-Category Distribution
+```bash
+uvicorn app.main:app --reload
+```
 
-Category
+## 4. Access Swagger UI
 
-Cases
+Open:
 
-Answerable
+```text
+http://127.0.0.1:8000/docs
+```
 
-10
+## 5. Run tests
 
-Multi-document
-
-5
-
-Ambiguous
-
-4
-
-Unanswerable
-
-3
-
-Adversarial
-
-3
-
-Total
-
-25
-
-Coverage requirement: Every answerable case has at least one expected source ID.
-
-2. ✅ Golden Set Validation
-
-The dataset validator is:
-
-scripts/validate_golden_set.py
-
-Run the Validator
-
-Run from the repository root:
-
-python scripts\validate_golden_set.py
-
-Verified Output
-
-Golden set validation PASSED
-Total cases: 25
-
-This verifies the required golden-set structure and category coverage.
-
-3. 📝 Manual Review
-
-The golden set was manually self-reviewed against the approved Day 5 corpus.
-
-Review Checks
-
-Question clarity
-
-Category assignment
-
-Expected source mappings
-
-Answerability classification
-
-Required category coverage
-
-Alignment with the approved corpus
-
-Review Results
-
-Review Item
-
-Result
-
-Cases reviewed
-
-25
-
-Incorrect source mappings
-
-0
-
-Cases requiring correction
-
-0
-
-Corrections made
-
-None
-
-Review type
-
-Manual self-review
-
-No artificial correction was introduced because the review did not identify a genuine source-mapping or answerability defect.
-
-Review Documentation
-
-docs/day13_golden_set_review.md
-
-Review limitation: The roadmap describes independent review by another intern. The team workflow for this task used manual self-review, so this repository does not claim independent peer review.
-
-4. ▶️ Evaluation Runner
-
-The Day 13 evaluation runner is:
-
-evals/run_evals.py
-
-The runner loads all cases from:
-
-datasets/golden_set.jsonl
-
-and executes them against the existing RAG pipeline.
-
-Run the Evaluation
-
-python evals\run_evals.py
-
-Information Recorded
-
-For every evaluation case, the runner records:
-
-Field
-
-Description
-
-Case ID
-
-Unique evaluation case identifier
-
-Question
-
-Question being evaluated
-
-Category
-
-Golden-set category
-
-Expected source IDs
-
-Expected supporting sources
-
-Expected answerability
-
-Expected answerability label
-
-Actual answer
-
-Generated answer
-
-Actual status
-
-Result status
-
-Actual citations
-
-Generated citations
-
-Retrieval results
-
-Retrieved source information
-
-Latency
-
-Case execution time
-
-Model version
-
-LLM model version
-
-Prompt version
-
-Prompt version used
-
-Configuration
-
-Evaluation configuration
-
-Errors
-
-Error information, if any
-
-Execution: All 25 cases were executed without manual intervention.
-
-5. ⚙️ Reproducible Evaluation Configuration
-
-The latest verified evaluation run used:
-
-top_k          : 3
-min_score      : None
-model_version  : openrouter/free
-prompt_version : v1
-
-The configuration is stored in the machine-readable evaluation result under:
-
-configuration
-
-This preserves the configuration and version information used for the evaluation run.
-
-6. 📊 Evaluation Results
-
-Evaluation artifacts are stored in:
-
-results/eval_runs/
-
-Available Evaluation Runs
-
-eval_20260916T101937Z.json
-eval_20260916T140012Z.json
-eval_20260917T082522Z.json
-
-Latest Verified Run
-
-results/eval_runs/eval_20260917T082522Z.json
-
-The latest run contains:
-
-25 evaluation results
-
-Generated answers
-
-Citations
-
-Retrieval results
-
-Status
-
-Latency
-
-Model version
-
-Prompt version
-
-Evaluation configuration
-
-Errors
-
-Timestamped filenames preserve previous evaluation artifacts and prevent earlier runs from being overwritten.
-
-7. 🔄 Evaluation Flow
-
-┌──────────────────────────────────┐
-│ datasets/golden_set.jsonl        │
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Load 25 Evaluation Cases         │
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Run Existing RAG Pipeline        │
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Capture Answer & Citations       │
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Capture Retrieval Results        │
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Capture Status & Latency         │
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Record Model / Prompt / Config   │
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Save Timestamped JSON Result     │
-└──────────────────────────────────┘
-
-8. 🧪 Day 13 Verification Commands
-
-The following commands are the important Day 13 execution and verification commands. Git commands are intentionally excluded.
-
-8.1 Validate the Golden Set
-
-python scripts\validate_golden_set.py
-
-Expected output:
-
-Golden set validation PASSED
-Total cases: 25
-
-8.2 Run the Evaluation
-
-python evals\run_evals.py
-
-Expected output:
-
-Evaluation run completed.
-Cases: 25
-
-A new timestamped result file is created under:
-
-results/eval_runs/
-
-8.3 Verify the Latest Evaluation Artifact
-
-python -c "import json; from pathlib import Path; p=Path('results/eval_runs/eval_20260917T082522Z.json'); d=json.loads(p.read_text(encoding='utf-8')); print('Run ID:', d['run_id']); print('Cases:', d['golden_set_cases']); print('Results:', len(d['results'])); print('Configuration:', d['configuration'])"
-
-Verified output:
-
-Run ID: 20260917T082522Z
-Cases: 25
-Results: 25
-Configuration: {'top_k': 3, 'min_score': None, 'model_version': 'openrouter/free', 'prompt_version': 'v1'}
-
-8.4 Run the Full Test Suite
-
+```bash
 pytest -q
+```
+
+---
+
+# API Documentation
+
+Once the application is running, the available API documentation can be accessed through:
+
+### Swagger UI
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### OpenAPI Schema
+
+```text
+http://127.0.0.1:8000/openapi.json
+```
+
+Available endpoints:
+
+```text
+GET  /health
+POST /ingest
+POST /ask
+GET  /documents/{document_id}
+```
 
-Latest verified result:
+---
 
-28 passed in 271.80s (0:04:31)
+# End-to-End Request Flow
 
-8.5 Complete Day 13 Verification Sequence
+The current end-to-end question-answering flow is:
 
-For a complete Day 13 verification, run:
+```text
+User
+  ↓
+FastAPI /ask
+  ↓
+Request ID Middleware
+  ↓
+AskRequest Validation
+  ↓
+Query Rewrite
+  ↓
+Vector Retrieval
+  ↓
+Top-5 Candidates
+  ↓
+Cross-Encoder Reranking
+  ↓
+Top-3 Results
+  ↓
+Grounded Context
+  ↓
+LLM Generation
+  ↓
+Citation Validation
+  ↓
+Source Logging
+  ↓
+AskResponse
+  ↓
+User
+```
 
-python scripts\validate_golden_set.py
-python evals\run_evals.py
-pytest -q
+Request observability runs alongside the request:
 
-This sequence:
+```text
+API Request
+    │
+    ├── Request ID
+    ├── Endpoint
+    ├── Start Time
+    ├── Total Latency
+    ├── Model Version
+    ├── Prompt Version
+    ├── Outcome
+    ├── Error Category
+    │
+    ├── Request Stages
+    │      ├── Retrieval
+    │      └── Generation
+    │
+    └── Request Sources
+           ├── Source ID
+           └── Retrieval Score
+```
+
+---
+
+# Engineering Principles
+
+The project follows several engineering principles.
+
+## Thin API Routes
+
+API routes coordinate existing application modules rather than duplicating business logic.
+
+```text
+Route
+  ↓
+Application / RAG function
+  ↓
+Existing implementation
+```
 
-Validates the golden dataset.
+## Explicit Contracts
 
-Executes all evaluation cases.
+Pydantic models define the expected request and response structures.
 
-Generates a timestamped machine-readable result.
+## Centralized Configuration
 
-Runs the complete project test suite.
+Configuration is accessed through the application settings rather than being hardcoded across modules.
 
-The evaluation runner creates a new timestamped result artifact for each run, so previous evaluation results are preserved.
+## Database Separation
 
-9. 📦 Day 13 Deliverables
+Database operations are kept in the database / CRUD layer instead of being embedded directly into business logic.
 
-Deliverable
+## Grounded Generation
 
-Location
+The LLM receives retrieved context rather than relying only on its internal knowledge.
 
-Status
+## Citation Validation
 
-Golden evaluation dataset
+Generated answers are checked against the retrieved evidence and citation structure.
 
-datasets/golden_set.jsonl
+## Evaluation-Driven Retrieval
 
-✅ Complete
+Retrieval changes are evaluated using measurable retrieval metrics before being selected.
 
-Evaluation runner
+## Observable API Execution
 
-evals/run_evals.py
+API requests record request IDs, latency, model and prompt versions, outcomes, stages, and retrieved sources to support diagnosis and debugging.
 
-✅ Complete
+## Safe Error Handling
 
-Golden-set validator
+External provider failures and unexpected internal failures are represented using stable error codes and safe client-facing messages.
 
-scripts/validate_golden_set.py
+---
 
-✅ Complete
+# Day 10 Key Achievements
 
-Review documentation
+- Added query rewriting to the retrieval flow.
+- Added cross-encoder reranking.
+- Improved Hit@1 from `0.90` to `1.00`.
+- Maintained Hit@3 at `1.00`.
+- Improved MRR from `0.95` to `1.00`.
+- Improved Q10 expected-document rank from `2` to `1`.
+- Evaluated retrieval quality against the existing baseline.
+- Measured the latency cost of reranking.
+- Added regression verification.
+- Selected a Top-5 retrieval → reranking → Top-3 final-context strategy.
+- Documented rejected experiments and final configuration.
 
-docs/day13_golden_set_review.md
+---
 
-✅ Complete
+# Day 11 Key Achievements
 
-Machine-readable evaluation results
+- Added FastAPI application wiring.
+- Added API route registration.
+- Added `/health`.
+- Added `/ingest`.
+- Added `/ask`.
+- Added `/documents/{document_id}`.
+- Added Pydantic API request / response models.
+- Added database dependency injection.
+- Added document lookup through the CRUD layer.
+- Added API validation tests.
+- Verified Swagger / OpenAPI documentation.
+- Verified API endpoints manually.
+- Completed the Day 11 service implementation.
 
-results/eval_runs/
+---
 
-✅ Complete
+# Day 12 Key Achievements
 
-10. ✅ Day 13 Completion Checklist
+- Added SQL request observability.
+- Added request ID generation and propagation.
+- Added request latency tracking.
+- Added model and prompt version tracking.
+- Added request outcome tracking.
+- Added request error categories.
+- Added retrieved source ID and score logging.
+- Added retrieval stage logging.
+- Added generation stage logging.
+- Added centralized API error handling.
+- Added stable error codes.
+- Added safe error messages.
+- Added dedicated provider error handling.
+- Added provider response validation.
+- Reviewed blocking database operations in asynchronous middleware.
+- Added and updated API tests.
+- Verified 10 API tests successfully.
+- Verified the full suite with 28 passing tests.
+- Manually verified successful `/ask` execution.
+- Manually verified provider failure handling.
+- Verified SQL request, stage, and source observability.
 
-Dataset
+---
 
-Evaluation case format defined
+# Day 12 Verification Summary
 
-25 golden-set cases created
+## API Test Suite
 
-Answerable cases included
+```text
+10 tests passed
+```
 
-Unanswerable cases included
+## Full Regression Suite
 
-Ambiguous cases included
+```text
+28 passed in 201.94s (0:03:21)
+```
 
-Multi-document cases included
+## Successful `/ask`
 
-Adversarial cases included
+```text
+HTTP/1.1 200 OK
+```
 
-Approved Day 5 corpus used
+Verified:
 
-Every answerable case has an expected source
+- Request ID
+- Grounded answer
+- Citation
+- Retrieved sources
+- Retrieval scores
+- Request outcome
+- Retrieval stages
+- Generation stages
 
-Review
+## Provider Failure
 
-Golden set manually self-reviewed
+```text
+HTTP/1.1 502 Bad Gateway
+```
 
-Review documentation completed
+Verified:
 
-No incorrect source mappings identified
+- `PROVIDER_ERROR`
+- Safe client-facing message
+- Request ID
+- Retrieval stage failure path
+- Generation failure stage
+- SQL error classification
 
-No cases required correction
+---
 
-Evaluation Runner
+# Development Workflow
 
-Evaluation runner implemented
+Each roadmap day follows an incremental engineering workflow:
 
-All 25 cases executed
+```text
+Understand Requirement
+        ↓
+Implement
+        ↓
+Run Tests
+        ↓
+Evaluate
+        ↓
+Review Changes
+        ↓
+Document
+        ↓
+Commit
+        ↓
+Push
+```
 
-No manual intervention required
+The goal is to ensure that each roadmap milestone is supported by working code, tests / evaluation evidence, documentation, and a reviewed Git change.
 
-Answers recorded
+---
 
-Citations recorded
+# Roadmap Progress
 
-Retrieval results recorded
+The project has completed:
 
-Status recorded
+```text
+Day 1  → Project Setup
+Day 2  → Document Processing
+Day 3  → Embeddings and Vector Storage
+Day 4  → Retrieval Pipeline
+Day 5  → RAG Pipeline
+Day 6  → Database and Persistence
+Day 7  → Safety and Validation
+Day 8  → Voice Capability
+Day 9  → Retrieval Evaluation
+Day 10 → Advanced Retrieval and Reranking
+Day 11 → FastAPI Service
+Day 12 → Observability, Error Handling and API Tests
+```
 
-Latency recorded
+---
 
-Model version recorded
+# Next Steps
 
-Prompt version recorded
+The next roadmap milestone is:
 
-Configuration recorded
+```text
+Day 13
+```
 
-Errors recorded
+Planned areas include:
 
-Results & Verification
-
-Golden-set validation passed
-
-Timestamped machine-readable result generated
-
-Previous evaluation artifacts preserved
-
-Full project test suite passed
-
-11. 📋 Final Verification Summary
-
-Metric
-
-Result
-
-Golden-set cases
-
-25
-
-Answerable
-
-10
-
-Multi-document
-
-5
-
-Ambiguous
-
-4
-
-Unanswerable
-
-3
-
-Adversarial
-
-3
-
-Cases executed
-
-25/25
-
-Golden-set validation
-
-PASSED
-
-Full test suite
-
-28/28 PASSED
-
-Latest evaluation run
-
-eval_20260917T082522Z.json
-
-Model version
-
-openrouter/free
-
-Prompt version
-
-v1
-
-Top-K
-
-3
-
-🎯 Day 13 Status: ✅ COMPLETE
-
-Golden set created • Reviewed • Validated • Evaluate
+- Day 13 implementation
+- Performance optimization
+- Additional document type support
+- Advanced query strategies
+- Production deployment preparation
+- Caching layer integration
