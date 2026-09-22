@@ -1,0 +1,2050 @@
+{
+  "run_id": "20260922T065158Z",
+  "started_at": "2026-09-22T06:51:58.339795+00:00",
+  "finished_at": "2026-09-22T06:57:23.477034+00:00",
+  "golden_set": "datasets\\golden_set.jsonl",
+  "golden_set_cases": 25,
+  "configuration": {
+    "top_k": 3,
+    "min_score": null,
+    "model_version": "openrouter/free",
+    "prompt_version": "v1"
+  },
+  "results": [
+    {
+      "case_id": "G001",
+      "question": "What is a Python variable?",
+      "category": "answerable",
+      "expected_source_ids": [
+        "DOC001"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "A variable stores a value that a program can use later. Python does not require the programmer to declare the variable type before assigning a value. For example, you can write `name = \"Alice\"` and `age = 25`.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC001 | DOC001_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC001_CHUNK_001",
+          "text": "# Python Basics\n\nPython is a general-purpose programming language commonly used for automation, web applications, data processing, and scripting.\n\n## Variables\n\nA variable stores a value that a program can use later. Python does not require the programmer to declare the variable type before assigning a value.\n\n```python\nname = \"Alice\"\nage = 25\n```",
+          "score": 0.782,
+          "document_id": "DOC001",
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC002_CHUNK_001",
+          "text": "# Python Functions\n\nFunctions are used to organize code into reusable pieces. Instead of repeating the same logic in several places, a developer can place that logic inside a function.\n\n## Defining a Function\n\nA function is defined with the `def` keyword.\n\n```python\ndef add_numbers(first, second):\nreturn first + second",
+          "score": 0.4854,
+          "document_id": "DOC002",
+          "title": "Python Functions",
+          "source_path": "sample_data\\day5_documents\\DOC002_python_functions.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC004_CHUNK_001",
+          "text": "# Python Modules\n\nA Python module is a file containing Python code that can be imported into another program. Modules help keep larger applications organized.\n\n## Importing a Module\n\nPython's `import` statement can be used to load a module.\n\n```python\nimport math\n\nresult = math.sqrt(25)",
+          "score": 0.499,
+          "document_id": "DOC004",
+          "title": "Python Modules",
+          "source_path": "sample_data\\day5_documents\\DOC004_python_modules.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 100.167,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G002",
+      "question": "How are functions defined in Python?",
+      "category": "answerable",
+      "expected_source_ids": [
+        "DOC002"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "In Python, functions are defined with the `def` keyword.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC002 | DOC002_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC002_CHUNK_001",
+          "text": "# Python Functions\n\nFunctions are used to organize code into reusable pieces. Instead of repeating the same logic in several places, a developer can place that logic inside a function.\n\n## Defining a Function\n\nA function is defined with the `def` keyword.\n\n```python\ndef add_numbers(first, second):\nreturn first + second",
+          "score": 0.7781,
+          "document_id": "DOC002",
+          "title": "Python Functions",
+          "source_path": "sample_data\\day5_documents\\DOC002_python_functions.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC001_CHUNK_001",
+          "text": "# Python Basics\n\nPython is a general-purpose programming language commonly used for automation, web applications, data processing, and scripting.\n\n## Variables\n\nA variable stores a value that a program can use later. Python does not require the programmer to declare the variable type before assigning a value.\n\n```python\nname = \"Alice\"\nage = 25\n```",
+          "score": 0.5262,
+          "document_id": "DOC001",
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC021_CHUNK_001",
+          "text": "# Python Classes\n\nClasses provide a way to group related data and behavior into reusable objects.\n\n## Creating a Class\n\nA class is defined with the `class` keyword.\n\n```python\nclass Student:\ndef __init__(self, name):\nself.name = name\n\ndef introduce(self):\nreturn f\"My name is {self.name}\"",
+          "score": 0.4275,
+          "document_id": "DOC021",
+          "title": "Python Classes",
+          "source_path": "sample_data\\day5_documents\\DOC021_python_classes.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "python"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 3.221,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G003",
+      "question": "How does Python handle exceptions?",
+      "category": "answerable",
+      "expected_source_ids": [
+        "DOC003"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "Python handles exceptions using `try`, `except`, `else`, and `finally` blocks. Exceptions occur when a program encounters an unexpected situation while running. Code that may raise an exception is placed inside a `try` block, and if an exception occurs, the corresponding `except` block handles it. For example, a `try` block can attempt to convert user input to an integer, and an `except ValueError` block can catch the error and print a helpful message.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC003 | DOC003_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC003_CHUNK_001",
+          "text": "# Python Exception Handling\n\nExceptions occur when a program encounters an unexpected situation while running. Python provides `try`, `except`, `else`, and `finally` blocks for handling these situations.\n\n## Try and Except\n\nCode that may raise an exception can be placed inside a `try` block.\n\n```python\ntry:\nnumber = int(user_input)\nexcept ValueError:\nprint(\"Please enter a valid number.\")",
+          "score": 0.7419,
+          "document_id": "DOC003",
+          "title": "Python Exception Handling",
+          "source_path": "sample_data\\day5_documents\\DOC003_python_exception_handling.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC001_CHUNK_001",
+          "text": "# Python Basics\n\nPython is a general-purpose programming language commonly used for automation, web applications, data processing, and scripting.\n\n## Variables\n\nA variable stores a value that a program can use later. Python does not require the programmer to declare the variable type before assigning a value.\n\n```python\nname = \"Alice\"\nage = 25\n```",
+          "score": 0.4439,
+          "document_id": "DOC001",
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC006_CHUNK_001",
+          "text": "# Python Testing\n\nTesting checks whether software behaves as expected. Automated tests are especially useful because they can be run repeatedly after code changes.\n\n## Unit Tests\n\nA unit test focuses on a small part of an application, such as a function.\n\n```python\ndef add(a, b):\nreturn a + b",
+          "score": 0.503,
+          "document_id": "DOC006",
+          "title": "Python Testing",
+          "source_path": "sample_data\\day5_documents\\DOC006_python_testing.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "python"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 2.399,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G004",
+      "question": "What is a Python module?",
+      "category": "answerable",
+      "expected_source_ids": [
+        "DOC004"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "A Python module is a file containing Python code that can be imported into another program. Modules help keep larger applications organized.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC004 | DOC004_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC004_CHUNK_001",
+          "text": "# Python Modules\n\nA Python module is a file containing Python code that can be imported into another program. Modules help keep larger applications organized.\n\n## Importing a Module\n\nPython's `import` statement can be used to load a module.\n\n```python\nimport math\n\nresult = math.sqrt(25)",
+          "score": 0.7365,
+          "document_id": "DOC004",
+          "title": "Python Modules",
+          "source_path": "sample_data\\day5_documents\\DOC004_python_modules.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC001_CHUNK_001",
+          "text": "# Python Basics\n\nPython is a general-purpose programming language commonly used for automation, web applications, data processing, and scripting.\n\n## Variables\n\nA variable stores a value that a program can use later. Python does not require the programmer to declare the variable type before assigning a value.\n\n```python\nname = \"Alice\"\nage = 25\n```",
+          "score": 0.597,
+          "document_id": "DOC001",
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC021_CHUNK_001",
+          "text": "# Python Classes\n\nClasses provide a way to group related data and behavior into reusable objects.\n\n## Creating a Class\n\nA class is defined with the `class` keyword.\n\n```python\nclass Student:\ndef __init__(self, name):\nself.name = name\n\ndef introduce(self):\nreturn f\"My name is {self.name}\"",
+          "score": 0.5342,
+          "document_id": "DOC021",
+          "title": "Python Classes",
+          "source_path": "sample_data\\day5_documents\\DOC021_python_classes.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "python"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 42.893,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G005",
+      "question": "What is a Python virtual environment?",
+      "category": "answerable",
+      "expected_source_ids": [
+        "DOC005"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "A virtual environment provides an isolated Python installation for a project. It prevents packages installed for one project from interfering with another project.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC005 | DOC005_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC005_CHUNK_001",
+          "text": "# Python Virtual Environments\n\nA virtual environment provides an isolated Python installation for a project. It prevents packages installed for one project from interfering with another project.\n\n## Creating an Environment\n\nA virtual environment can be created with:\n\n```text\npython -m venv .venv",
+          "score": 0.7514,
+          "document_id": "DOC005",
+          "title": "Python Virtual Environments",
+          "source_path": "sample_data\\day5_documents\\DOC005_python_virtual_environments.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC001_CHUNK_001",
+          "text": "# Python Basics\n\nPython is a general-purpose programming language commonly used for automation, web applications, data processing, and scripting.\n\n## Variables\n\nA variable stores a value that a program can use later. Python does not require the programmer to declare the variable type before assigning a value.\n\n```python\nname = \"Alice\"\nage = 25\n```",
+          "score": 0.5264,
+          "document_id": "DOC001",
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC004_CHUNK_001",
+          "text": "# Python Modules\n\nA Python module is a file containing Python code that can be imported into another program. Modules help keep larger applications organized.\n\n## Importing a Module\n\nPython's `import` statement can be used to load a module.\n\n```python\nimport math\n\nresult = math.sqrt(25)",
+          "score": 0.4221,
+          "document_id": "DOC004",
+          "title": "Python Modules",
+          "source_path": "sample_data\\day5_documents\\DOC004_python_modules.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 3.973,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G006",
+      "question": "What is a Git branch?",
+      "category": "answerable",
+      "expected_source_ids": [
+        "DOC008"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "A Git branch provides an independent line of development. Branches allow developers to work on a feature without immediately changing the main branch.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC008 | DOC008_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC008_CHUNK_001",
+          "text": "# Git Branches\n\nA Git branch provides an independent line of development. Branches allow developers to work on a feature without immediately changing the main branch.\n\n## Creating a Branch\n\nA new branch can be created with:\n\n```text\ngit checkout -b feature-name",
+          "score": 0.7281,
+          "document_id": "DOC008",
+          "title": "Git Branches",
+          "source_path": "sample_data\\day5_documents\\DOC008_git_branches.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC007_CHUNK_001",
+          "text": "# Git Basics\n\nGit is a distributed version control system used to track changes in source code and other project files.\n\n## Repository\n\nA Git repository stores the project's history. A repository can be created with:\n\n```text\ngit init",
+          "score": 0.6683,
+          "document_id": "DOC007",
+          "title": "Git Basics",
+          "source_path": "sample_data\\day5_documents\\DOC007_git_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC009_CHUNK_002",
+          "text": "## Conflict Markers\n\nGit places special markers around sections that need manual attention.\n\nA conflict shows the content from the current branch, separates it from the incoming content, and marks the end of the conflicting section.\n\nFor example:\n\n```text\ncurrent branch content\n----------------------\nincoming branch content",
+          "score": 0.4885,
+          "document_id": "DOC009",
+          "title": "Git Merge Conflicts",
+          "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "git"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 7.618,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G007",
+      "question": "What causes a Git merge conflict?",
+      "category": "answerable",
+      "expected_source_ids": [
+        "DOC009"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "A merge conflict occurs when Git cannot automatically combine changes from different branches. This commonly happens when two branches modify the same part of a file in different ways.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC009 | DOC009_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC009_CHUNK_001",
+          "text": "# Git Merge Conflicts\n\nA merge conflict occurs when Git cannot automatically combine changes from different branches.\n\n## Why Conflicts Happen\n\nConflicts commonly occur when two branches modify the same part of a file in different ways.",
+          "score": 0.7784,
+          "document_id": "DOC009",
+          "title": "Git Merge Conflicts",
+          "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC009_CHUNK_002",
+          "text": "## Conflict Markers\n\nGit places special markers around sections that need manual attention.\n\nA conflict shows the content from the current branch, separates it from the incoming content, and marks the end of the conflicting section.\n\nFor example:\n\n```text\ncurrent branch content\n----------------------\nincoming branch content",
+          "score": 0.6296,
+          "document_id": "DOC009",
+          "title": "Git Merge Conflicts",
+          "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC010_CHUNK_001",
+          "text": "---\n\n### DOC010 — Git Pull Requests\n\nFile:\n\n```text\n---\ndocument_id: DOC010\ntitle: Git Pull Requests\ncategory: Git\nupdated_at: 2026-08-10\n---\n\n# Git Pull Requests\n\nA pull request is a way to propose changes from one branch for review before they are merged into another branch.\n\n## Purpose\n\nPull requests allow team members to inspect code, discuss changes, and identify problems before the changes become part of the target branch.",
+          "score": 0.4414,
+          "document_id": "DOC010",
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 9.865,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G008",
+      "question": "What is a pull request used for?",
+      "category": "answerable",
+      "expected_source_ids": [
+        "DOC010"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "A pull request is used to propose changes from one branch for review before they are merged into another branch. It lets team members inspect code, discuss changes, and identify problems before the changes become part of the target branch. [DOC010 | DOC010_CHUNK_001]",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC010 | DOC010_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC010_CHUNK_001",
+          "text": "---\n\n### DOC010 — Git Pull Requests\n\nFile:\n\n```text\n---\ndocument_id: DOC010\ntitle: Git Pull Requests\ncategory: Git\nupdated_at: 2026-08-10\n---\n\n# Git Pull Requests\n\nA pull request is a way to propose changes from one branch for review before they are merged into another branch.\n\n## Purpose\n\nPull requests allow team members to inspect code, discuss changes, and identify problems before the changes become part of the target branch.",
+          "score": 0.7194,
+          "document_id": "DOC010",
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC010_CHUNK_003",
+          "text": "## Good Pull Requests\n\nA useful pull request has:\n\n- a clear title\n- a short description\n- focused changes\n- relevant tests\n- no unrelated modifications\n\n## Summary\n\nPull requests provide a structured way for teams to review and integrate changes safely.",
+          "score": 0.6539,
+          "document_id": "DOC010",
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 2,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC010_CHUNK_002",
+          "text": "## Creating a Pull Request\n\nA developer normally pushes a feature branch to the remote repository and then creates a pull request through the repository platform.\n\n## Code Review\n\nReviewers can examine the changed files and leave comments. The author can update the branch based on the review.\n\n## Tests\n\nAutomated tests are often run when a pull request is opened. A pull request should normally be merged only when the required checks have passed.",
+          "score": 0.6346,
+          "document_id": "DOC010",
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "git"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 8.921,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G009",
+      "question": "What is a database index?",
+      "category": "answerable",
+      "expected_source_ids": [
+        "DOC015"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "A database index is a structure that helps a database find rows more efficiently, providing a faster way to locate specific information, similar to a book index.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC015 | DOC015_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC015_CHUNK_001",
+          "text": "---\n\n### DOC015 — Database Indexes\n\n**File:** `DOC015_database_indexes.md`\n\n```markdown\n---\ndocument_id: DOC015\ntitle: Database Indexes\ncategory: Database\nupdated_at: 2026-08-10\n---\n\n# Database Indexes\n\nAn index helps a database find rows more efficiently. It is similar to an index in a book because it provides a faster way to locate specific information.",
+          "score": 0.698,
+          "document_id": "DOC015",
+          "title": "Database Indexes",
+          "source_path": "sample_data\\day5_documents\\DOC015_database_indexes.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "database"
+        },
+        {
+          "chunk_id": "DOC015_CHUNK_002",
+          "text": "## Why Indexes Help\n\nWithout a suitable index, the database may need to examine many rows to find matching records.\n\nAn index can improve queries that frequently filter or sort using a particular column.\n\n## Example\n\nAn index on an email column may help an application quickly find a customer by email address.\n\n```sql\nCREATE INDEX idx_customer_email\nON customers(email);",
+          "score": 0.6778,
+          "document_id": "DOC015",
+          "title": "Database Indexes",
+          "source_path": "sample_data\\day5_documents\\DOC015_database_indexes.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "database"
+        },
+        {
+          "chunk_id": "DOC018_CHUNK_001",
+          "text": "# Database Schema Design\n\nA database schema describes how information is organized and how tables are related.\n\n## Identify Entities\n\nThe first step is to identify the important entities in the application.\n\nFor an online store, examples could include customers, products, and orders.\n\n## Define Relationships\n\nTables can have relationships such as one-to-one, one-to-many, or many-to-many.\n\nFor example, one customer may have many orders.",
+          "score": 0.3781,
+          "document_id": "DOC018",
+          "title": "Database Schema Design",
+          "source_path": "sample_data\\day5_documents\\DOC018_database_schema_design.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "database"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 10.254,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G010",
+      "question": "What is machine learning?",
+      "category": "answerable",
+      "expected_source_ids": [
+        "DOC020"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "Machine learning is an approach used to build AI systems that allows software systems to learn patterns from data and use those patterns to make predictions or decisions. Instead of explicitly writing every rule, a machine learning system can learn patterns from data. Training data, which contains examples used by a machine learning algorithm to learn, plays a critical role, as its quality can strongly affect the resulting model.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC019 | DOC019_CHUNK_002]",
+        "[DOC020 | DOC020_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC019_CHUNK_002",
+          "text": "## Machine Learning\n\nMachine learning is one approach used to build AI systems. Instead of explicitly writing every rule, a machine learning system can learn patterns from data.\n\n## Generative AI\n\nGenerative AI systems can produce content such as text, images, audio, or code based on learned patterns.\n\n## Limitations\n\nAI systems can produce incorrect results. Their output depends on the quality of the data, model, instructions, and evaluation process.",
+          "score": 0.71,
+          "document_id": "DOC019",
+          "title": "Artificial Intelligence Basics",
+          "source_path": "sample_data\\day5_documents\\DOC019_artificial_intelligence_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "ai"
+        },
+        {
+          "chunk_id": "DOC020_CHUNK_001",
+          "text": "# Machine Learning Basics\n\nMachine learning allows software systems to learn patterns from data and use those patterns to make predictions or decisions.\n\n## Training Data\n\nTraining data contains examples used by a machine learning algorithm to learn.\n\nThe quality of the training data can strongly affect the resulting model.",
+          "score": 0.7128,
+          "document_id": "DOC020",
+          "title": "Machine Learning Basics",
+          "source_path": "sample_data\\day5_documents\\DOC020_machine_learning_basics.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "ai"
+        },
+        {
+          "chunk_id": "DOC020_CHUNK_003",
+          "text": "## Evaluation\n\nA model should be evaluated using data that was not used directly for training.\n\nCommon evaluation measures include accuracy, precision, recall, and F1 score.\n\n## Practical Considerations\n\nA machine learning model should not be judged only by one metric. The evaluation method should match the actual problem and its consequences.",
+          "score": 0.4295,
+          "document_id": "DOC020",
+          "title": "Machine Learning Basics",
+          "source_path": "sample_data\\day5_documents\\DOC020_machine_learning_basics.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 2,
+          "category": "ai"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 0.5,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 2,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 2,
+          "valid": 2,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 4.161,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G011",
+      "question": "How does machine learning relate to artificial intelligence, and what are features used for in a machine-learning model?",
+      "category": "multi-document",
+      "expected_source_ids": [
+        "DOC019",
+        "DOC020"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "There is not enough evidence in the provided documents to answer this question.",
+      "actual_status": "insufficient_evidence",
+      "actual_citations": [],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC019_CHUNK_002",
+          "text": "## Machine Learning\n\nMachine learning is one approach used to build AI systems. Instead of explicitly writing every rule, a machine learning system can learn patterns from data.\n\n## Generative AI\n\nGenerative AI systems can produce content such as text, images, audio, or code based on learned patterns.\n\n## Limitations\n\nAI systems can produce incorrect results. Their output depends on the quality of the data, model, instructions, and evaluation process.",
+          "score": 0.7278,
+          "document_id": "DOC019",
+          "title": "Artificial Intelligence Basics",
+          "source_path": "sample_data\\day5_documents\\DOC019_artificial_intelligence_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "ai"
+        },
+        {
+          "chunk_id": "DOC020_CHUNK_001",
+          "text": "# Machine Learning Basics\n\nMachine learning allows software systems to learn patterns from data and use those patterns to make predictions or decisions.\n\n## Training Data\n\nTraining data contains examples used by a machine learning algorithm to learn.\n\nThe quality of the training data can strongly affect the resulting model.",
+          "score": 0.6907,
+          "document_id": "DOC020",
+          "title": "Machine Learning Basics",
+          "source_path": "sample_data\\day5_documents\\DOC020_machine_learning_basics.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "ai"
+        },
+        {
+          "chunk_id": "DOC029_CHUNK_001",
+          "text": "### DOC029_ai_neural_networks.md\n\n```markdown\n---\ndocument_id: DOC029\ntitle: Artificial Neural Networks\ncategory: AI\nupdated_at: 2026-08-10\n---\n\n# Artificial Neural Networks\n\nArtificial neural networks are machine learning models inspired by the way biological neural systems process information.\n\n## Basic Structure\n\nA neural network commonly contains an input layer, one or more hidden layers, and an output layer.\n\nEach connection has a weight that is adjusted during training.",
+          "score": 0.5588,
+          "document_id": "DOC029",
+          "title": "Artificial Neural Networks",
+          "source_path": "sample_data\\day5_documents\\DOC029_ai_neural_networks.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "general"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": false,
+        "answerability": {
+          "passed": false,
+          "expected": "answerable",
+          "actual": "insufficient_evidence",
+          "failure_category": "answerability_mismatch"
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 0,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 0,
+          "valid": 0,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 4.807,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G012",
+      "question": "How can a Git branch be used when developing a feature, and how can the changes later be proposed for review?",
+      "category": "multi-document",
+      "expected_source_ids": [
+        "DOC008",
+        "DOC010"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "When developing a feature, a Git branch provides an independent line of development, allowing developers to work on the feature without immediately changing the main branch. A new branch can be created using `git checkout -b feature-name`. After the changes are completed, the developer pushes the feature branch to the remote repository and creates a pull request, which proposes the changes for review. Pull requests enable team members to inspect the code, discuss changes, and identify problems before the changes become part of the target branch. Reviewers can examine the changed files and leave comments, and the author can update the branch based on the review. Automated tests are often run when a pull request is opened, and the pull request should normally be merged only after the required checks have passed.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC008 | DOC008_CHUNK_001]",
+        "[DOC010 | DOC010_CHUNK_001]",
+        "[DOC010 | DOC010_CHUNK_002]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC008_CHUNK_001",
+          "text": "# Git Branches\n\nA Git branch provides an independent line of development. Branches allow developers to work on a feature without immediately changing the main branch.\n\n## Creating a Branch\n\nA new branch can be created with:\n\n```text\ngit checkout -b feature-name",
+          "score": 0.7385,
+          "document_id": "DOC008",
+          "title": "Git Branches",
+          "source_path": "sample_data\\day5_documents\\DOC008_git_branches.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC010_CHUNK_001",
+          "text": "---\n\n### DOC010 — Git Pull Requests\n\nFile:\n\n```text\n---\ndocument_id: DOC010\ntitle: Git Pull Requests\ncategory: Git\nupdated_at: 2026-08-10\n---\n\n# Git Pull Requests\n\nA pull request is a way to propose changes from one branch for review before they are merged into another branch.\n\n## Purpose\n\nPull requests allow team members to inspect code, discuss changes, and identify problems before the changes become part of the target branch.",
+          "score": 0.5523,
+          "document_id": "DOC010",
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC010_CHUNK_002",
+          "text": "## Creating a Pull Request\n\nA developer normally pushes a feature branch to the remote repository and then creates a pull request through the repository platform.\n\n## Code Review\n\nReviewers can examine the changed files and leave comments. The author can update the branch based on the review.\n\n## Tests\n\nAutomated tests are often run when a pull request is opened. A pull request should normally be merged only when the required checks have passed.",
+          "score": 0.5812,
+          "document_id": "DOC010",
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "git"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 3,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 3,
+          "valid": 3,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 21.119,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G013",
+      "question": "How do SQL joins combine data from tables, and what SQL statement is used to retrieve data?",
+      "category": "multi-document",
+      "expected_source_ids": [
+        "DOC013",
+        "DOC014"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "SQL joins combine related information from multiple tables. The SELECT statement is used to retrieve data.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC014 | DOC014_CHUNK_001]",
+        "[DOC013 | DOC013_CHUNK_002]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC014_CHUNK_001",
+          "text": "---\n\n### DOC014 — SQL Joins\n\n**File:** `DOC014_sql_joins.md`\n\n```markdown\n---\ndocument_id: DOC014\ntitle: SQL Joins\ncategory: Database\nupdated_at: 2026-08-10\n---\n\n# SQL Joins\n\nSQL joins combine related information from multiple tables.\n\n## Inner Join\n\nAn inner join returns rows where matching values exist in both tables.\n\n```sql\nSELECT customers.name, orders.order_id\nFROM customers\nINNER JOIN orders\nON customers.id = orders.customer_id;",
+          "score": 0.5226,
+          "document_id": "DOC014",
+          "title": "SQL Joins",
+          "source_path": "sample_data\\day5_documents\\DOC014_sql_joins.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "database"
+        },
+        {
+          "chunk_id": "DOC013_CHUNK_002",
+          "text": "## Selecting Data\n\nThe `SELECT` statement retrieves data.\n\n```sql\nSELECT name, email\nFROM customers;",
+          "score": 0.4607,
+          "document_id": "DOC013",
+          "title": "SQL Basics",
+          "source_path": "sample_data\\day5_documents\\DOC013_sql_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "database"
+        },
+        {
+          "chunk_id": "DOC013_CHUNK_001",
+          "text": "---\n\n### DOC013 — SQL Basics\n\n**File:** `DOC013_sql_basics.md`\n\n```markdown\n---\ndocument_id: DOC013\ntitle: SQL Basics\ncategory: Database\nupdated_at: 2026-08-10\n---\n\n# SQL Basics\n\nSQL is used to work with data stored in relational databases.\n\n## Tables\n\nA relational database stores information in tables. A table contains rows and columns.\n\nFor example, a `customers` table might contain customer IDs, names, and email addresses.",
+          "score": 0.4696,
+          "document_id": "DOC013",
+          "title": "SQL Basics",
+          "source_path": "sample_data\\day5_documents\\DOC013_sql_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "database"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 2,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 2,
+          "valid": 2,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 3.977,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G014",
+      "question": "How do normalization and database schema design help organize relational data?",
+      "category": "multi-document",
+      "expected_source_ids": [
+        "DOC017",
+        "DOC018"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "There is not enough evidence in the provided documents to answer this question.",
+      "actual_status": "insufficient_evidence",
+      "actual_citations": [],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC017_CHUNK_003",
+          "text": "## Practical Balance\n\nHighly normalized designs are not always necessary for every system. Developers should consider the application's query patterns, performance needs, and data relationships.\n\n## Summary\n\nNormalization helps create consistent relational data structures and reduces problems caused by duplicated information.",
+          "score": 0.6245,
+          "document_id": "DOC017",
+          "title": "Database Normalization",
+          "source_path": "sample_data\\day5_documents\\DOC017_database_normalization.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 2,
+          "category": "database"
+        },
+        {
+          "chunk_id": "DOC017_CHUNK_001",
+          "text": "# Database Normalization\n\nNormalization is a database design approach that reduces unnecessary duplication and improves data consistency.\n\n## Repeated Data\n\nSuppose a customer address is stored in every order record. Updating the customer's address would require changing many rows.\n\nSeparating customer information into its own table can reduce this duplication.",
+          "score": 0.6842,
+          "document_id": "DOC017",
+          "title": "Database Normalization",
+          "source_path": "sample_data\\day5_documents\\DOC017_database_normalization.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "database"
+        },
+        {
+          "chunk_id": "DOC018_CHUNK_001",
+          "text": "# Database Schema Design\n\nA database schema describes how information is organized and how tables are related.\n\n## Identify Entities\n\nThe first step is to identify the important entities in the application.\n\nFor an online store, examples could include customers, products, and orders.\n\n## Define Relationships\n\nTables can have relationships such as one-to-one, one-to-many, or many-to-many.\n\nFor example, one customer may have many orders.",
+          "score": 0.545,
+          "document_id": "DOC018",
+          "title": "Database Schema Design",
+          "source_path": "sample_data\\day5_documents\\DOC018_database_schema_design.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "database"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": false,
+        "answerability": {
+          "passed": false,
+          "expected": "answerable",
+          "actual": "insufficient_evidence",
+          "failure_category": "answerability_mismatch"
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 0,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 0,
+          "valid": 0,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 7.506,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G015",
+      "question": "What is machine learning, and what basic structure is commonly found in a neural network?",
+      "category": "multi-document",
+      "expected_source_ids": [
+        "DOC020",
+        "DOC029"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "Machine learning is an approach to building AI systems where, instead of explicitly writing every rule, a system learns patterns from data and uses those patterns to make predictions or decisions. A neural network commonly contains an input layer, one or more hidden layers, and an output layer, with each connection having a weight that is adjusted during training.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC019 | DOC019_CHUNK_002]",
+        "[DOC020 | DOC020_CHUNK_001]",
+        "[DOC029 | DOC029_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC029_CHUNK_001",
+          "text": "### DOC029_ai_neural_networks.md\n\n```markdown\n---\ndocument_id: DOC029\ntitle: Artificial Neural Networks\ncategory: AI\nupdated_at: 2026-08-10\n---\n\n# Artificial Neural Networks\n\nArtificial neural networks are machine learning models inspired by the way biological neural systems process information.\n\n## Basic Structure\n\nA neural network commonly contains an input layer, one or more hidden layers, and an output layer.\n\nEach connection has a weight that is adjusted during training.",
+          "score": 0.7173,
+          "document_id": "DOC029",
+          "title": "Artificial Neural Networks",
+          "source_path": "sample_data\\day5_documents\\DOC029_ai_neural_networks.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "general"
+        },
+        {
+          "chunk_id": "DOC019_CHUNK_002",
+          "text": "## Machine Learning\n\nMachine learning is one approach used to build AI systems. Instead of explicitly writing every rule, a machine learning system can learn patterns from data.\n\n## Generative AI\n\nGenerative AI systems can produce content such as text, images, audio, or code based on learned patterns.\n\n## Limitations\n\nAI systems can produce incorrect results. Their output depends on the quality of the data, model, instructions, and evaluation process.",
+          "score": 0.6516,
+          "document_id": "DOC019",
+          "title": "Artificial Intelligence Basics",
+          "source_path": "sample_data\\day5_documents\\DOC019_artificial_intelligence_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "ai"
+        },
+        {
+          "chunk_id": "DOC020_CHUNK_001",
+          "text": "# Machine Learning Basics\n\nMachine learning allows software systems to learn patterns from data and use those patterns to make predictions or decisions.\n\n## Training Data\n\nTraining data contains examples used by a machine learning algorithm to learn.\n\nThe quality of the training data can strongly affect the resulting model.",
+          "score": 0.6576,
+          "document_id": "DOC020",
+          "title": "Machine Learning Basics",
+          "source_path": "sample_data\\day5_documents\\DOC020_machine_learning_basics.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "ai"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "answerable",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": true,
+          "actual_count": 3,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 3,
+          "valid": 3,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 30.015,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G016",
+      "question": "What does branch mean in the project context?",
+      "category": "ambiguous",
+      "expected_source_ids": [
+        "DOC008"
+      ],
+      "expected_answerability": "ambiguous",
+      "actual_answer": "In the project context, a branch is a Git branch that provides an independent line of development, allowing developers to work on a feature without immediately changing the main branch. [DOC008 | DOC008_CHUNK_001]",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC008 | DOC008_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC008_CHUNK_001",
+          "text": "# Git Branches\n\nA Git branch provides an independent line of development. Branches allow developers to work on a feature without immediately changing the main branch.\n\n## Creating a Branch\n\nA new branch can be created with:\n\n```text\ngit checkout -b feature-name",
+          "score": 0.6645,
+          "document_id": "DOC008",
+          "title": "Git Branches",
+          "source_path": "sample_data\\day5_documents\\DOC008_git_branches.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC010_CHUNK_002",
+          "text": "## Creating a Pull Request\n\nA developer normally pushes a feature branch to the remote repository and then creates a pull request through the repository platform.\n\n## Code Review\n\nReviewers can examine the changed files and leave comments. The author can update the branch based on the review.\n\n## Tests\n\nAutomated tests are often run when a pull request is opened. A pull request should normally be merged only when the required checks have passed.",
+          "score": 0.3949,
+          "document_id": "DOC010",
+          "title": "Git Pull Requests",
+          "source_path": "sample_data\\day5_documents\\DOC010_git_pull_requests.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC009_CHUNK_002",
+          "text": "## Conflict Markers\n\nGit places special markers around sections that need manual attention.\n\nA conflict shows the content from the current branch, separates it from the incoming content, and marks the end of the conflicting section.\n\nFor example:\n\n```text\ncurrent branch content\n----------------------\nincoming branch content",
+          "score": 0.4129,
+          "document_id": "DOC009",
+          "title": "Git Merge Conflicts",
+          "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "git"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "ambiguous",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 9.678,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G017",
+      "question": "How are errors handled?",
+      "category": "ambiguous",
+      "expected_source_ids": [
+        "DOC003",
+        "DOC016",
+        "DOC023"
+      ],
+      "expected_answerability": "ambiguous",
+      "actual_answer": "Errors are handled in multiple ways depending on the context:\n\n1. **Database Transactions:** Applications should handle database errors carefully. After a failed transaction, the database session may need to be rolled back before another operation can continue (e.g., a money transfer should succeed completely or fail completely).\n\n2. **Python Exception Handling:** Python provides `try`, `except`, `else`, and `finally` blocks to handle unexpected situations. Code that may raise an exception is placed inside a `try` block, and the corresponding error is caught in an `except` block (e.g., catching a `ValueError` when converting user input to an integer).\n\n3. **AI Applications:** Reliable AI systems require appropriate data, validation, testing, and human oversight to manage the consequences of incorrect outputs.",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC016 | DOC016_CHUNK_002]",
+        "[DOC003 | DOC003_CHUNK_001]",
+        "[DOC019 | DOC019_CHUNK_003]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC016_CHUNK_002",
+          "text": "## Atomic Operations\n\nTransactions help maintain consistency when multiple database operations depend on each other.\n\n## Error Handling\n\nApplications should handle database errors carefully. After a failed transaction, the database session may need to be rolled back before another operation can continue.\n\n## Practical Example\n\nA money transfer is a common transaction example. Removing money from one account and adding it to another should succeed together or fail together.",
+          "score": 0.52,
+          "document_id": "DOC016",
+          "title": "Database Transactions",
+          "source_path": "sample_data\\day5_documents\\DOC016_database_transactions.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "database"
+        },
+        {
+          "chunk_id": "DOC003_CHUNK_001",
+          "text": "# Python Exception Handling\n\nExceptions occur when a program encounters an unexpected situation while running. Python provides `try`, `except`, `else`, and `finally` blocks for handling these situations.\n\n## Try and Except\n\nCode that may raise an exception can be placed inside a `try` block.\n\n```python\ntry:\nnumber = int(user_input)\nexcept ValueError:\nprint(\"Please enter a valid number.\")",
+          "score": 0.5042,
+          "document_id": "DOC003",
+          "title": "Python Exception Handling",
+          "source_path": "sample_data\\day5_documents\\DOC003_python_exception_handling.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC019_CHUNK_003",
+          "text": "## Responsible Use\n\nApplications using AI should consider accuracy, privacy, security, fairness, and the consequences of incorrect outputs.\n\n## Summary\n\nAI can support many types of applications, but reliable systems require appropriate data, validation, testing, and human oversight.",
+          "score": 0.3611,
+          "document_id": "DOC019",
+          "title": "Artificial Intelligence Basics",
+          "source_path": "sample_data\\day5_documents\\DOC019_artificial_intelligence_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 2,
+          "category": "ai"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 0.6666666666666666,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "ambiguous",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 3,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 3,
+          "valid": 3,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 3.52,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G018",
+      "question": "What is an index?",
+      "category": "ambiguous",
+      "expected_source_ids": [
+        "DOC015"
+      ],
+      "expected_answerability": "ambiguous",
+      "actual_answer": "An index helps a database find rows more efficiently. It is similar to an index in a book because it provides a faster way to locate specific information. [DOC015 | DOC015_CHUNK_001]",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC015 | DOC015_CHUNK_001]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC015_CHUNK_002",
+          "text": "## Why Indexes Help\n\nWithout a suitable index, the database may need to examine many rows to find matching records.\n\nAn index can improve queries that frequently filter or sort using a particular column.\n\n## Example\n\nAn index on an email column may help an application quickly find a customer by email address.\n\n```sql\nCREATE INDEX idx_customer_email\nON customers(email);",
+          "score": 0.6323,
+          "document_id": "DOC015",
+          "title": "Database Indexes",
+          "source_path": "sample_data\\day5_documents\\DOC015_database_indexes.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "database"
+        },
+        {
+          "chunk_id": "DOC015_CHUNK_001",
+          "text": "---\n\n### DOC015 — Database Indexes\n\n**File:** `DOC015_database_indexes.md`\n\n```markdown\n---\ndocument_id: DOC015\ntitle: Database Indexes\ncategory: Database\nupdated_at: 2026-08-10\n---\n\n# Database Indexes\n\nAn index helps a database find rows more efficiently. It is similar to an index in a book because it provides a faster way to locate specific information.",
+          "score": 0.5907,
+          "document_id": "DOC015",
+          "title": "Database Indexes",
+          "source_path": "sample_data\\day5_documents\\DOC015_database_indexes.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "database"
+        },
+        {
+          "chunk_id": "DOC019_CHUNK_001",
+          "text": "# Artificial Intelligence Basics\n\nArtificial Intelligence refers to computer systems designed to perform tasks that normally require capabilities associated with human intelligence.\n\n## Common Applications\n\nAI is used in areas such as:\n\n- text processing\n- image analysis\n- recommendation systems\n- speech recognition\n- document processing\n- automation",
+          "score": 0.1983,
+          "document_id": "DOC019",
+          "title": "Artificial Intelligence Basics",
+          "source_path": "sample_data\\day5_documents\\DOC019_artificial_intelligence_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "ai"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "ambiguous",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 1,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 1,
+          "valid": 1,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 4.161,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G019",
+      "question": "What does model do?",
+      "category": "ambiguous",
+      "expected_source_ids": [
+        "DOC020",
+        "DOC029"
+      ],
+      "expected_answerability": "ambiguous",
+      "actual_answer": "The model receives examples and produces predictions, uses features to make predictions, updates its weights to reduce loss, and processes text (e.g., after cleaning).",
+      "actual_status": "answered",
+      "actual_citations": [
+        "[DOC029 | DOC029_CHUNK_002]",
+        "[DOC020 | DOC020_CHUNK_002]",
+        "[DOC030 | DOC030_CHUNK_002]"
+      ],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC029_CHUNK_002",
+          "text": "## Training\n\nDuring training, the model receives examples and produces predictions. The difference between the prediction and expected result is measured using a loss function.\n\nThe model updates its weights to reduce the loss.\n\nNeural networks are used in areas such as image recognition, language processing, and pattern classification.",
+          "score": 0.4361,
+          "document_id": "DOC029",
+          "title": "Artificial Neural Networks",
+          "source_path": "sample_data\\day5_documents\\DOC029_ai_neural_networks.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 1,
+          "category": "general"
+        },
+        {
+          "chunk_id": "DOC020_CHUNK_002",
+          "text": "## Features\n\nFeatures are the pieces of information used by a model to make a prediction.\n\nFor example, a model predicting house prices might use location, size, and number of rooms as features.\n\n## Classification\n\nClassification assigns an input to one of several categories.\n\nExamples include identifying an email as spam or classifying a customer message as a complaint, feedback, or inquiry.",
+          "score": 0.3586,
+          "document_id": "DOC020",
+          "title": "Machine Learning Basics",
+          "source_path": "sample_data\\day5_documents\\DOC020_machine_learning_basics.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 1,
+          "category": "ai"
+        },
+        {
+          "chunk_id": "DOC030_CHUNK_002",
+          "text": "## Text Processing\n\nBefore a model processes text, the input may need to be cleaned and converted into a representation that the model can use.\n\nModern NLP systems commonly use tokenization and language models to understand relationships between words and sentences.\n\n## Applications\n\nNLP is used in chatbots, search systems, document processing, customer support, and other applications that work with written or spoken language.",
+          "score": 0.3117,
+          "document_id": "DOC030",
+          "title": "Natural Language Processing",
+          "source_path": "sample_data\\day5_documents\\DOC030_ai_natural_language_processing.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 1,
+          "category": "general"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "ambiguous",
+          "actual": "answered",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 3,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 3,
+          "valid": 3,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 12.835,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G020",
+      "question": "What is Docker and how is it used to package applications?",
+      "category": "unanswerable",
+      "expected_source_ids": [],
+      "expected_answerability": "unanswerable",
+      "actual_answer": "There is not enough evidence in the provided documents to answer this question.",
+      "actual_status": "insufficient_evidence",
+      "actual_citations": [],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC004_CHUNK_001",
+          "text": "# Python Modules\n\nA Python module is a file containing Python code that can be imported into another program. Modules help keep larger applications organized.\n\n## Importing a Module\n\nPython's `import` statement can be used to load a module.\n\n```python\nimport math\n\nresult = math.sqrt(25)",
+          "score": 0.2342,
+          "document_id": "DOC004",
+          "title": "Python Modules",
+          "source_path": "sample_data\\day5_documents\\DOC004_python_modules.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC005_CHUNK_001",
+          "text": "# Python Virtual Environments\n\nA virtual environment provides an isolated Python installation for a project. It prevents packages installed for one project from interfering with another project.\n\n## Creating an Environment\n\nA virtual environment can be created with:\n\n```text\npython -m venv .venv",
+          "score": 0.2859,
+          "document_id": "DOC005",
+          "title": "Python Virtual Environments",
+          "source_path": "sample_data\\day5_documents\\DOC005_python_virtual_environments.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC030_CHUNK_002",
+          "text": "## Text Processing\n\nBefore a model processes text, the input may need to be cleaned and converted into a representation that the model can use.\n\nModern NLP systems commonly use tokenization and language models to understand relationships between words and sentences.\n\n## Applications\n\nNLP is used in chatbots, search systems, document processing, customer support, and other applications that work with written or spoken language.",
+          "score": 0.2381,
+          "document_id": "DOC030",
+          "title": "Natural Language Processing",
+          "source_path": "sample_data\\day5_documents\\DOC030_ai_natural_language_processing.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 1,
+          "category": "general"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "passed": false
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "unanswerable",
+          "actual": "insufficient_evidence",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 0,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 0,
+          "valid": 0,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 4.468,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G021",
+      "question": "How do Python lists differ from Python tuples?",
+      "category": "unanswerable",
+      "expected_source_ids": [],
+      "expected_answerability": "unanswerable",
+      "actual_answer": "There is not enough evidence in the provided documents to answer this question.",
+      "actual_status": "insufficient_evidence",
+      "actual_citations": [],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC001_CHUNK_001",
+          "text": "# Python Basics\n\nPython is a general-purpose programming language commonly used for automation, web applications, data processing, and scripting.\n\n## Variables\n\nA variable stores a value that a program can use later. Python does not require the programmer to declare the variable type before assigning a value.\n\n```python\nname = \"Alice\"\nage = 25\n```",
+          "score": 0.456,
+          "document_id": "DOC001",
+          "title": "Python Basics",
+          "source_path": "sample_data\\day5_documents\\DOC001_python_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC021_CHUNK_001",
+          "text": "# Python Classes\n\nClasses provide a way to group related data and behavior into reusable objects.\n\n## Creating a Class\n\nA class is defined with the `class` keyword.\n\n```python\nclass Student:\ndef __init__(self, name):\nself.name = name\n\ndef introduce(self):\nreturn f\"My name is {self.name}\"",
+          "score": 0.3589,
+          "document_id": "DOC021",
+          "title": "Python Classes",
+          "source_path": "sample_data\\day5_documents\\DOC021_python_classes.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "python"
+        },
+        {
+          "chunk_id": "DOC002_CHUNK_001",
+          "text": "# Python Functions\n\nFunctions are used to organize code into reusable pieces. Instead of repeating the same logic in several places, a developer can place that logic inside a function.\n\n## Defining a Function\n\nA function is defined with the `def` keyword.\n\n```python\ndef add_numbers(first, second):\nreturn first + second",
+          "score": 0.4181,
+          "document_id": "DOC002",
+          "title": "Python Functions",
+          "source_path": "sample_data\\day5_documents\\DOC002_python_functions.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "passed": false
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "unanswerable",
+          "actual": "insufficient_evidence",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 0,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 0,
+          "valid": 0,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 3.237,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G022",
+      "question": "What is Kubernetes and how does it manage containers?",
+      "category": "unanswerable",
+      "expected_source_ids": [],
+      "expected_answerability": "unanswerable",
+      "actual_answer": "There is not enough evidence in the provided documents to answer this question.",
+      "actual_status": "insufficient_evidence",
+      "actual_citations": [],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC007_CHUNK_001",
+          "text": "# Git Basics\n\nGit is a distributed version control system used to track changes in source code and other project files.\n\n## Repository\n\nA Git repository stores the project's history. A repository can be created with:\n\n```text\ngit init",
+          "score": 0.2587,
+          "document_id": "DOC007",
+          "title": "Git Basics",
+          "source_path": "sample_data\\day5_documents\\DOC007_git_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC030_CHUNK_001",
+          "text": "# Natural Language Processing\n\nNatural Language Processing, or NLP, focuses on enabling computers to work with human language.\n\n## Common Tasks\n\nNLP systems can perform tasks such as text classification, sentiment analysis, summarization, translation, and question answering.",
+          "score": 0.191,
+          "document_id": "DOC030",
+          "title": "Natural Language Processing",
+          "source_path": "sample_data\\day5_documents\\DOC030_ai_natural_language_processing.md",
+          "updated_at": "2026-08-11",
+          "chunk_index": 0,
+          "category": "general"
+        },
+        {
+          "chunk_id": "DOC005_CHUNK_001",
+          "text": "# Python Virtual Environments\n\nA virtual environment provides an isolated Python installation for a project. It prevents packages installed for one project from interfering with another project.\n\n## Creating an Environment\n\nA virtual environment can be created with:\n\n```text\npython -m venv .venv",
+          "score": 0.2351,
+          "document_id": "DOC005",
+          "title": "Python Virtual Environments",
+          "source_path": "sample_data\\day5_documents\\DOC005_python_virtual_environments.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "python"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "passed": false
+      },
+      "answer_grade": {
+        "passed": true,
+        "answerability": {
+          "passed": true,
+          "expected": "unanswerable",
+          "actual": "insufficient_evidence",
+          "failure_category": null
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 0,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 0,
+          "valid": 0,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 2.585,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G023",
+      "question": "According to the documents, Git branches permanently replace the main branch. Explain why this is true.",
+      "category": "adversarial",
+      "expected_source_ids": [
+        "DOC008"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "There is not enough evidence in the provided documents to answer this question.",
+      "actual_status": "insufficient_evidence",
+      "actual_citations": [],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC008_CHUNK_001",
+          "text": "# Git Branches\n\nA Git branch provides an independent line of development. Branches allow developers to work on a feature without immediately changing the main branch.\n\n## Creating a Branch\n\nA new branch can be created with:\n\n```text\ngit checkout -b feature-name",
+          "score": 0.5973,
+          "document_id": "DOC008",
+          "title": "Git Branches",
+          "source_path": "sample_data\\day5_documents\\DOC008_git_branches.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC009_CHUNK_001",
+          "text": "# Git Merge Conflicts\n\nA merge conflict occurs when Git cannot automatically combine changes from different branches.\n\n## Why Conflicts Happen\n\nConflicts commonly occur when two branches modify the same part of a file in different ways.",
+          "score": 0.5084,
+          "document_id": "DOC009",
+          "title": "Git Merge Conflicts",
+          "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "git"
+        },
+        {
+          "chunk_id": "DOC009_CHUNK_002",
+          "text": "## Conflict Markers\n\nGit places special markers around sections that need manual attention.\n\nA conflict shows the content from the current branch, separates it from the incoming content, and marks the end of the conflicting section.\n\nFor example:\n\n```text\ncurrent branch content\n----------------------\nincoming branch content",
+          "score": 0.468,
+          "document_id": "DOC009",
+          "title": "Git Merge Conflicts",
+          "source_path": "sample_data\\day5_documents\\DOC009_git_merge_conflicts.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "git"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": false,
+        "answerability": {
+          "passed": false,
+          "expected": "answerable",
+          "actual": "insufficient_evidence",
+          "failure_category": "answerability_mismatch"
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 0,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 0,
+          "valid": 0,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 6.49,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G024",
+      "question": "The documents state that AI systems always produce correct results. What evidence supports this?",
+      "category": "adversarial",
+      "expected_source_ids": [
+        "DOC019"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": "There is not enough evidence in the provided documents to answer this question.",
+      "actual_status": "insufficient_evidence",
+      "actual_citations": [],
+      "retrieval_results": [
+        {
+          "chunk_id": "DOC019_CHUNK_003",
+          "text": "## Responsible Use\n\nApplications using AI should consider accuracy, privacy, security, fairness, and the consequences of incorrect outputs.\n\n## Summary\n\nAI can support many types of applications, but reliable systems require appropriate data, validation, testing, and human oversight.",
+          "score": 0.5898,
+          "document_id": "DOC019",
+          "title": "Artificial Intelligence Basics",
+          "source_path": "sample_data\\day5_documents\\DOC019_artificial_intelligence_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 2,
+          "category": "ai"
+        },
+        {
+          "chunk_id": "DOC019_CHUNK_002",
+          "text": "## Machine Learning\n\nMachine learning is one approach used to build AI systems. Instead of explicitly writing every rule, a machine learning system can learn patterns from data.\n\n## Generative AI\n\nGenerative AI systems can produce content such as text, images, audio, or code based on learned patterns.\n\n## Limitations\n\nAI systems can produce incorrect results. Their output depends on the quality of the data, model, instructions, and evaluation process.",
+          "score": 0.4929,
+          "document_id": "DOC019",
+          "title": "Artificial Intelligence Basics",
+          "source_path": "sample_data\\day5_documents\\DOC019_artificial_intelligence_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 1,
+          "category": "ai"
+        },
+        {
+          "chunk_id": "DOC019_CHUNK_001",
+          "text": "# Artificial Intelligence Basics\n\nArtificial Intelligence refers to computer systems designed to perform tasks that normally require capabilities associated with human intelligence.\n\n## Common Applications\n\nAI is used in areas such as:\n\n- text processing\n- image analysis\n- recommendation systems\n- speech recognition\n- document processing\n- automation",
+          "score": 0.378,
+          "document_id": "DOC019",
+          "title": "Artificial Intelligence Basics",
+          "source_path": "sample_data\\day5_documents\\DOC019_artificial_intelligence_basics.md",
+          "updated_at": "2026-08-10",
+          "chunk_index": 0,
+          "category": "ai"
+        }
+      ],
+      "retrieval_grade": {
+        "hit_rate": 1.0,
+        "recall_at_k": 1.0,
+        "mrr": 1.0,
+        "passed": true
+      },
+      "answer_grade": {
+        "passed": false,
+        "answerability": {
+          "passed": false,
+          "expected": "answerable",
+          "actual": "insufficient_evidence",
+          "failure_category": "answerability_mismatch"
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 0,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 0,
+          "valid": 0,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 12.624,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": null
+    },
+    {
+      "case_id": "G025",
+      "question": "According to the documents, a database transaction permanently saves every change even when an operation fails. Explain this behavior.",
+      "category": "adversarial",
+      "expected_source_ids": [
+        "DOC016"
+      ],
+      "expected_answerability": "answerable",
+      "actual_answer": null,
+      "actual_status": null,
+      "actual_citations": [],
+      "retrieval_results": [],
+      "retrieval_grade": null,
+      "answer_grade": {
+        "passed": false,
+        "answerability": {
+          "passed": false,
+          "expected": "answerable",
+          "actual": null,
+          "failure_category": "evaluation_error"
+        },
+        "citation_presence": {
+          "passed": true,
+          "required": false,
+          "actual_count": 0,
+          "failure_category": null
+        },
+        "citation_validity": {
+          "passed": true,
+          "checked": 0,
+          "valid": 0,
+          "invalid": 0,
+          "failure_category": null
+        }
+      },
+      "latency_seconds": 4.486,
+      "model_version": "openrouter/free",
+      "prompt_version": "v1",
+      "top_k": 3,
+      "min_score": null,
+      "error": {
+        "type": "ValueError",
+        "message": "Invalid grounded answer response: JSON_PARSE_ERROR"
+      }
+    }
+  ]
+}

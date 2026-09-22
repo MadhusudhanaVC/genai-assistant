@@ -1,0 +1,10 @@
+{
+  "answer_pass_rate": 0.75,
+  "retrieval_hit_rate": 0.8,
+  "recall_at_k": 0.8,
+  "mrr": 0.8,
+  "citation_correctness": 0.95,
+  "answerability_accuracy": 0.75,
+  "abstention_accuracy": 0.75,
+  "max_average_latency_seconds": 20.0
+}

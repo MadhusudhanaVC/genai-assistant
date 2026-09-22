@@ -1,488 +1,616 @@
-# GenAI Assistant: Day 13 - Golden Set & Evaluation Runner
+# Day 14 — Graders, Scorecard & Regression Checks
 
-> Building a representative golden evaluation dataset and a repeatable evaluation runner to measure end-to-end RAG pipeline quality.
+GenAI Engineering Roadmap · Day 14 Documentation
 
-## Overview
+Day 14 focuses on separating retrieval quality from answer quality and building an automated quality gate for the RAG pipeline.
 
-Day 13 establishes the foundation for continuous evaluation of the RAG (Retrieval-Augmented Generation) pipeline. This includes a curated dataset of 25 evaluation cases covering diverse scenarios (answerable, unanswerable, ambiguous, multi-document, and adversarial) and an automated evaluation runner that captures comprehensive metrics for each execution.
+The implementation adds retrieval graders, answer graders, a review-friendly evaluation report, an automated scorecard, regression thresholds, and a one-command regression check.
 
----
+## 📌 Practical Goal
 
-## 🎯 Objectives
+Separate retrieval quality from answer quality and produce a scorecard that guides the next improvement.
 
-- ✅ Create a reviewed golden evaluation dataset with **25 comprehensive cases**
-- ✅ Cover diverse question types and edge cases
-- ✅ Define expected source mappings and answerability for each case
-- ✅ Build a repeatable evaluation runner with full observability
-- ✅ Capture answers, citations, retrieval results, status, latency, versions, and configuration
-- ✅ Generate timestamped, machine-readable result artifacts
-- ✅ Prevent overwriting of previous evaluation runs
+## 1. 🎯 Day 14 Objectives
 
----
+The Day 14 implementation covers the following roadmap requirements:
 
-## 📁 Project Structure
+- Implement retrieval graders.
+- Measure expected-source retrieval using Hit Rate, Recall@K, and MRR.
+- Implement answer-quality checks.
+- Check answerability status.
+- Check citation presence and citation validity.
+- Check required facts where available.
+- Check correct abstention for unsupported questions.
+- Generate review-friendly per-case evaluation output.
+- Generate an automated quality scorecard.
+- Identify common failure categories.
+- Track latency and a cost proxy.
+- Define regression thresholds.
+- Return a failing process status when a critical threshold is broken.
+
+## 2. 📁 Day 14 Project Structure
 
 ```
 genai-assistant/
 │
 ├── app/
-│   └── ...                              # Existing RAG application
+│   └── ...                         # Existing RAG application
 │
 ├── datasets/
-│   ├── day6_retrieval_test_cases.json
-│   ├── prompt_test_cases.json
-│   └── golden_set.jsonl                 # 25 evaluation cases
+│   └── golden_set.jsonl            # 25-case Day 13 evaluation dataset
 │
 ├── docs/
-│   └── day13_golden_set_review.md       # Review documentation
+│   └── day13_golden_set_review.md  # Day 13 review documentation
 │
 ├── evals/
-│   └── run_evals.py                     # Evaluation runner
+│   ├── answer_grader.py            # Day 14 answer-quality graders
+│   ├── check_regression.py         # Day 14 regression quality gate
+│   ├── generate_eval_report.py     # Day 14 per-case report generator
+│   ├── generate_scorecard.py       # Day 14 automated scorecard generator
+│   ├── regression_thresholds.json  # Day 14 minimum quality thresholds
+│   ├── retrieval_grader.py         # Day 14 retrieval graders
+│   └── run_evals.py                # Evaluation runner
+│
+├── results/
+│   ├── eval_runs/                  # Timestamped evaluation results
+│   ├── eval_reports/               # Day 14 per-case evaluation reports
+│   └── scorecards/                 # Day 14 scorecard artifacts
 │
 ├── prompts/
 │   └── grounded_answer.txt
 │
-├── results/
-│   └── eval_runs/                       # Timestamped evaluation artifacts
-│       ├── eval_20260916T101937Z.json
-│       ├── eval_20260916T140012Z.json
-│       └── eval_20260917T082522Z.json
-│
-├── sample_data/
-│   └── day5_documents/                  # Approved corpus (DOC001–DOC030)
-│
-├── sample_inputs/
-├── sample_outputs/
+├── tests/
+│   └── ...
 │
 ├── scripts/
-│   └── validate_golden_set.py           # Dataset validator
+│   └── ...
 │
-├── tests/
-│   └── ...                              # Project tests
-│
-├── .env
 ├── .env.example
-├── .gitignore
-├── genai.db                             # Local runtime database
-├── pytest.ini
+├── genai.db
 ├── pyproject.toml
 └── README.md
 ```
 
----
+check_regression_backup.py is a local backup of the regression checker and is not a required Day 14 deliverable.
 
-## 🚀 Quick Start
+## 3. 🧩 Day 14 Components
 
-### Prerequisites
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| Retrieval Grader | evals/retrieval_grader.py | Measures expected-source retrieval quality |
+| Answer Grader | evals/answer_grader.py | Measures answerability, citations, facts, and abstention |
+| Evaluation Runner | evals/run_evals.py | Executes the golden-set evaluation |
+| Evaluation Report Generator | evals/generate_eval_report.py | Creates per-case review output |
+| Scorecard Generator | evals/generate_scorecard.py | Creates the automated quality scorecard |
+| Regression Thresholds | evals/regression_thresholds.json | Defines minimum acceptable quality |
+| Regression Checker | evals/check_regression.py | Enforces quality thresholds with PASS/FAIL status |
+| Evaluation Runs | results/eval_runs/ | Stores timestamped evaluation results |
+| Evaluation Reports | results/eval_reports/ | Stores review-friendly reports |
+| Scorecards | results/scorecards/ | Stores timestamped scorecards |
 
-- Python 3.8+
-- Dependencies installed (`pyproject.toml`)
-- Environment variables configured (`.env`)
+## 4. 🔎 Retrieval Graders
 
-### Run Complete Day 13 Verification
+The retrieval grader is implemented in:
 
-Execute the full verification sequence from the repository root:
+`evals/retrieval_grader.py`
 
-```bash
-python scripts/validate_golden_set.py
-python evals/run_evals.py
-pytest -q
+It evaluates whether expected source documents appear in the retrieved top-k results.
+
+### Retrieval Metrics
+
+#### Hit Rate
+
+Checks whether at least one expected source appears in the retrieved results.
+
+```
+Hit Rate = 1 when at least one expected source is retrieved
+           0 otherwise
 ```
 
-This will:
-1. Validate the golden dataset structure
-2. Execute all 25 evaluation cases
-3. Generate a timestamped machine-readable result
-4. Run the complete project test suite
+#### Recall@K
 
----
+Measures how many of the expected source documents were retrieved within the evaluated top-k results.
 
-## 📊 Golden Evaluation Dataset
-
-### Location
 ```
-datasets/golden_set.jsonl
+Recall@K = retrieved expected sources / total expected sources
 ```
 
-### Coverage
+#### Mean Reciprocal Rank (MRR)
 
-| Category | Cases | Coverage |
-|----------|-------|----------|
-| Answerable | 10 | 40% |
-| Multi-document | 5 | 20% |
-| Ambiguous | 4 | 16% |
-| Unanswerable | 3 | 12% |
-| Adversarial | 3 | 12% |
-| **Total** | **25** | **100%** |
+Measures the reciprocal rank of the first retrieved expected source.
 
-### Evaluation Case Format
+```
+MRR = 1 / rank of the first relevant result
+```
 
-Each case contains:
+If no expected source is retrieved, the MRR is 0.0.
+
+### Retrieval Grader Output
+
+Each graded case includes:
+
+- hit_rate
+- recall_at_k
+- mrr
+- passed
+
+A retrieval case passes when at least one expected source is retrieved.
+
+## 5. 📝 Answer Graders
+
+The answer grader is implemented in:
+
+`evals/answer_grader.py`
+
+It separates answer quality from retrieval quality.
+
+### 5.1 Answerability Check
+
+Expected and actual answerability are compared using the evaluation case definition.
+
+Supported statuses include:
+
+- answered
+- insufficient_evidence
+
+For ambiguous cases, both an answered response and an insufficient-evidence response can be accepted according to the evaluation logic.
+
+### 5.2 Citation Presence
+
+The grader checks whether citations are present when an answer is returned.
+
+For an answered response:
+
+- At least one citation is required.
+
+For an insufficient_evidence response:
+
+- No citations are expected.
+
+### 5.3 Citation Validity
+
+Citation references are checked against the retrieved source information and expected citation structure.
+
+The baseline evaluation recorded:
+
+- Checked citations : 27
+- Valid citations   : 27
+- Correctness       : 1.0
+
+### 5.4 Required Facts
+
+Where expected facts are available, the grader checks whether the required fact text is present in the generated answer.
+
+Cases without expected facts are not forced through a required-facts check.
+
+The required-facts logic was also tested against a negative example to prevent unrelated text from being treated as a valid required fact.
+
+### 5.5 Unsupported-Question Abstention
+
+Unsupported questions must correctly use the insufficient-evidence path rather than producing an unsupported answer.
+
+The baseline achieved:
+
+- Correct abstentions : 3 / 3
+- Abstention accuracy : 1.0
+
+## 6. 📊 Review-Friendly Evaluation Report
+
+The per-case report generator is:
+
+`evals/generate_eval_report.py`
+
+It produces a review-friendly report containing:
 
 | Field | Description |
 |-------|-------------|
-| `case_id` | Unique evaluation case ID |
-| `question` | Question being evaluated |
-| `category` | Evaluation category (from coverage table above) |
-| `expected_source_ids` | Expected supporting source document IDs |
-| `answerability` | Expected answerability classification |
-| `notes` | Optional additional evaluation guidance |
+| Case | Evaluation case ID |
+| Retrieval | Retrieval pass/fail result |
+| Answer | Answer-quality pass/fail result |
+| Latency | Case execution latency |
+| Failure Category | Primary failure category |
+| Details | Additional per-case grading information |
 
-**Requirement:** Every answerable case has at least one expected source ID.
+### Final Baseline Report
 
----
+The report was generated from the valid baseline evaluation run:
 
-## ✅ Golden Set Validation
+`results/eval_runs/eval_20260922T065158Z.json`
 
-### Run the Validator
+Generated report:
 
-```bash
-python scripts/validate_golden_set.py
-```
+`results/eval_reports/report_20260922T114940Z.md`
 
-### Expected Output
+The report contains results for all:
 
-```
-Golden set validation PASSED
-Total cases: 25
-```
+- 25 cases
 
-### Validation Checks
+## 7. 📈 Automated Scorecard
 
-- ✅ Golden-set structure compliance
-- ✅ Required field presence
-- ✅ Category coverage requirements
-- ✅ Expected source mapping validity
+The scorecard generator is:
 
----
+`evals/generate_scorecard.py`
 
-## 📝 Manual Review
+It summarizes the evaluation run into a machine-readable quality scorecard.
 
-The golden set was manually self-reviewed against the approved Day 5 corpus.
+### Scorecard Metrics
 
-| Review Item | Result |
-|-------------|--------|
-| Cases reviewed | 25 |
-| Incorrect source mappings | 0 |
-| Cases requiring correction | 0 |
-| Review type | Manual self-review |
+The scorecard contains:
 
-**Documentation:** See `docs/day13_golden_set_review.md`
+- Total cases
+- Answer grading pass rate
+- Retrieval pass rate
+- Hit Rate
+- Recall@K
+- MRR
+- Citation correctness
+- Answerability accuracy
+- Abstention accuracy
+- Average latency
+- Maximum latency
+- Failure categories
+- Top three failure categories
+- Component-level quality metrics
+- Weakest component
+- LLM-call cost proxy
 
----
+## 8. 🏁 Baseline Evaluation Scorecard
 
-## ▶️ Evaluation Runner
+The valid Day 14 baseline scorecard is:
 
-### Location
-```
-evals/run_evals.py
-```
+`results/scorecards/scorecard_20260922T065158Z.json`
 
-### Execute All Cases
+### Baseline Summary
 
-```bash
-python evals/run_evals.py
-```
+| Metric | Baseline Result |
+|--------|-----------------|
+| Total cases | 25 |
+| Answer pass rate | 0.8000 (80.00%) |
+| Retrieval pass rate | 0.8750 (87.50%) |
+| Retrieval Hit Rate | 0.8750 (87.50%) |
+| Recall@K | 0.8611 (86.11%) |
+| MRR | 0.8542 (85.42%) |
+| Citation correctness | 1.0000 (100%) |
+| Answerability accuracy | 0.8000 (80.00%) |
+| Abstention accuracy | 1.0000 (100%) |
+| Average latency | 12.9992 seconds |
+| Maximum latency | 100.167 seconds |
+| LLM-call cost proxy | 25 calls |
 
-### Output
+## 9. 🚨 Failure Analysis
 
-```
-Evaluation run completed.
-Cases: 25
-```
+The baseline scorecard identified the following failure categories:
 
-A new timestamped result file is created under `results/eval_runs/`
+| Failure Category | Count |
+|------------------|-------|
+| Answerability mismatch | 4 |
+| Retrieval failure | 3 |
+| Evaluation error | 1 |
 
-### Captured Information
+### Top Three Failure Categories
 
-For every evaluation case, the runner records:
+1. Answerability mismatch — 4 cases
+2. Retrieval failure — 3 cases
+3. Evaluation error — 1 case
 
-| Field | Description |
-|-------|-------------|
-| Case ID | Unique evaluation case identifier |
-| Question | Question being evaluated |
-| Category | Golden-set category |
-| Expected source IDs | Expected supporting sources |
-| Expected answerability | Expected answerability label |
-| Actual answer | Generated answer from RAG pipeline |
-| Actual status | Result status code |
-| Actual citations | Generated citations |
-| Retrieval results | Retrieved source information |
-| Latency | Case execution time (ms) |
-| Model version | LLM model version used |
-| Prompt version | Prompt template version |
-| Configuration | Evaluation configuration (top_k, min_score, etc.) |
-| Errors | Error information, if any |
+These categories are generated from the evaluation results rather than manually assigned.
 
----
+## 10. 🧭 Component Quality Analysis
 
-## ⚙️ Reproducible Evaluation Configuration
+The scorecard calculates separate component metrics so retrieval and answer quality can be analyzed independently.
 
-### Latest Verified Run
+| Component | Metric |
+|-----------|--------|
+| Answer quality | 0.8000 |
+| Retrieval quality | 0.8750 |
+| Citation quality | 1.0000 |
+| Abstention quality | 1.0000 |
+
+### Weakest Component
+
+- Component : Answer quality
+- Metric    : 0.8000
+
+Therefore, the Day 14 baseline evidence identifies answer quality as the weakest measured component.
+
+## 11. ⚙️ Regression Thresholds
+
+Regression thresholds are defined in:
+
+`evals/regression_thresholds.json`
+
+Current thresholds:
 
 ```json
 {
-  "top_k": 3,
-  "min_score": null,
-  "model_version": "openrouter/free",
-  "prompt_version": "v1"
+  "answer_pass_rate": 0.75,
+  "retrieval_hit_rate": 0.8,
+  "recall_at_k": 0.8,
+  "mrr": 0.8,
+  "citation_correctness": 0.95,
+  "answerability_accuracy": 0.75,
+  "abstention_accuracy": 0.75,
+  "max_average_latency_seconds": 20.0
 }
 ```
 
-Configuration and version information are stored in the machine-readable evaluation result under the `configuration` field.
+For quality metrics, the actual value must be greater than or equal to the configured minimum.
 
----
+For average latency, the actual value must be less than or equal to the configured maximum.
 
-## 📊 Evaluation Results
+## 12. 🛡️ One-Command Regression Quality Check
 
-### Location
-```
-results/eval_runs/
-```
+The regression checker is:
 
-### Available Runs
+`evals/check_regression.py`
 
-- `eval_20260916T101937Z.json`
-- `eval_20260916T140012Z.json`
-- `eval_20260917T082522Z.json` (Latest)
-
-### Result Structure
-
-Each evaluation run contains:
-
-- 25 evaluation results
-- Generated answers and citations
-- Retrieval results with scores
-- Status and latency metrics
-- Model, prompt, and configuration versions
-- Error logs for failed cases
-
-**Note:** Timestamped filenames preserve previous runs and prevent data loss.
-
----
-
-## 🔄 Evaluation Flow
-
-```
-┌──────────────────────────────────┐
-│ datasets/golden_set.jsonl        │ Load 25 evaluation cases
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Run Existing RAG Pipeline        │ Execute pipeline for each case
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Capture Answer & Citations       │ Extract generated results
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Capture Retrieval Results        │ Log retrieved sources
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Capture Status & Latency         │ Record execution metrics
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Record Model / Prompt / Config   │ Preserve version info
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│ Save Timestamped JSON Result     │ Store results/eval_runs/
-└──────────────────────────────────┘
-```
-
----
-
-## 🧪 Verification Commands
-
-### 1. Validate the Golden Set
+Run it with:
 
 ```bash
-python scripts/validate_golden_set.py
+python evals\check_regression.py
 ```
 
-**Expected output:**
+The checker:
+
+- Finds available scorecards.
+- Skips provider/evaluation-error-only scorecards.
+- Loads the latest valid scorecard.
+- Loads the configured regression thresholds.
+- Checks every critical metric.
+- Prints PASS/FAIL for each threshold.
+- Returns a successful process status only when all checks pass.
+
+## 13. ✅ Verified Regression Check
+
+The valid baseline was checked against the Day 14 thresholds.
+
 ```
-Golden set validation PASSED
-Total cases: 25
+Answer pass rate: 0.8 (minimum 0.75) -> PASS
+Retrieval hit rate: 0.875 (minimum 0.8) -> PASS
+Recall@K: 0.8611 (minimum 0.8) -> PASS
+MRR: 0.8542 (minimum 0.8) -> PASS
+Citation correctness: 1.0 (minimum 0.95) -> PASS
+Answerability accuracy: 0.8 (minimum 0.75) -> PASS
+Abstention accuracy: 1.0 (minimum 0.75) -> PASS
+Average latency: 12.9992 (maximum 20.0) -> PASS
+REGRESSION CHECK PASSED
 ```
 
----
+The quality gate therefore passed for the valid baseline scorecard.
 
-### 2. Run the Evaluation
+## 14. 🧪 Regression Failure Test
+
+A deliberately weakened configuration was previously used to verify that the regression checker can detect a quality regression.
+
+The test demonstrated the required behavior:
+
+```
+Threshold broken
+       ↓
+Metric marked FAIL
+       ↓
+Overall regression check marked FAILED
+       ↓
+Non-zero failure status returned
+```
+
+After restoring the valid baseline scorecard and thresholds, the regression check returned:
+
+```
+REGRESSION CHECK PASSED
+```
+
+This satisfies the Day 14 requirement that a deliberately weakened configuration can trigger a regression failure.
+
+## 15. 🔄 Day 14 Evaluation Flow
+
+```
+┌─────────────────────────────────────┐
+│ datasets/golden_set.jsonl           │
+│ 25 evaluation cases                 │
+└──────────────────┬──────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────┐
+│ evals/run_evals.py                  │
+│ Execute RAG evaluation              │
+└──────────────────┬──────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────┐
+│ Retrieval Results + Generated Answer│
+│ Citations + Status + Latency        │
+└──────────────────┬──────────────────┘
+                   │
+          ┌────────┴────────┐
+          ▼                 ▼
+┌──────────────────┐ ┌────────────────────┐
+│ Retrieval Grader │ │ Answer Grader      │
+│ Hit Rate         │ │ Answerability      │
+│ Recall@K         │ │ Citation Presence │
+│ MRR              │ │ Citation Validity │
+└────────┬─────────┘ │ Required Facts    │
+         │           │ Abstention        │
+         │           └─────────┬──────────┘
+         └─────────────┬───────┘
+                       ▼
+┌─────────────────────────────────────┐
+│ generate_eval_report.py             │
+│ Per-case pass/fail + failure data   │
+└──────────────────┬──────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────┐
+│ generate_scorecard.py               │
+│ Aggregate quality metrics           │
+│ Failure categories + weakest area   │
+└──────────────────┬──────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────┐
+│ check_regression.py                 │
+│ Compare against thresholds          │
+└──────────────────┬──────────────────┘
+                   │
+                   ▼
+          ┌─────────────────┐
+          │ PASS / FAIL     │
+          │ Quality Gate    │
+          └─────────────────┘
+```
+
+## 16. 🧪 Day 14 Verification Commands
+
+### 16.1 Compile Grader and Evaluation Modules
 
 ```bash
-python evals/run_evals.py
+python -m py_compile evals\retrieval_grader.py
+python -m py_compile evals\answer_grader.py
+python -m py_compile evals\generate_eval_report.py
+python -m py_compile evals\generate_scorecard.py
+python -m py_compile evals\check_regression.py
 ```
 
-**Expected output:**
+All required modules compiled successfully during Day 14 verification.
+
+### 16.2 Generate the Baseline Evaluation Report
+
+```bash
+python evals\generate_eval_report.py --input results\eval_runs\eval_20260922T065158Z.json
 ```
-Evaluation run completed.
+
+Verified output:
+
+```
+Evaluation report generated.
 Cases: 25
+Report: ...\results\eval_reports\report_20260922T114940Z.md
 ```
 
-A new timestamped result file is created under `results/eval_runs/`
-
----
-
-### 3. Verify the Latest Evaluation Artifact
+### 16.3 Run the Regression Quality Check
 
 ```bash
-python -c "import json; from pathlib import Path; p=Path('results/eval_runs/eval_20260917T082522Z.json'); d=json.loads(p.read_text(encoding='utf-8')); print('Run ID:', d['run_id']); print('Cases:', d['golden_set_cases']); print('Results:', len(d['results'])); print('Configuration:', d['configuration'])"
+python evals\check_regression.py
 ```
 
-**Expected output:**
+Verified result:
+
 ```
-Run ID: 20260917T082522Z
-Cases: 25
-Results: 25
-Configuration: {'top_k': 3, 'min_score': None, 'model_version': 'openrouter/free', 'prompt_version': 'v1'}
+REGRESSION CHECK PASSED
 ```
 
----
+## 17. ⚠️ Evaluation Provider Note
 
-### 4. Run the Full Test Suite
+During Day 14, the configured OpenRouter free-model provider reached its daily free-model quota.
 
-```bash
-pytest -q
-```
+The direct provider test returned a rate-limit error indicating that the free-model daily request allowance had been exhausted.
 
-**Expected output:**
-```
-28 passed in 271.80s (0:04:31)
-```
+Several later evaluation runs therefore contained provider/evaluation errors. These runs were not used as the Day 14 quality baseline.
 
----
+The valid baseline used for Day 14 reporting and regression verification is:
 
-### 5. Complete Day 13 Verification Sequence
+- Evaluation run: `results/eval_runs/eval_20260922T065158Z.json`
+- Scorecard: `results/scorecards/scorecard_20260922T065158Z.json`
+- Report: `results/eval_reports/report_20260922T114940Z.md`
 
-For comprehensive Day 13 verification:
+The regression checker was updated so provider/evaluation-error-only scorecards are not selected as the quality baseline.
 
-```bash
-python scripts/validate_golden_set.py
-python evals/run_evals.py
-pytest -q
-```
+## 18. 📦 Day 14 Required Deliverables
 
-This sequence:
-- ✅ Validates the golden dataset
-- ✅ Executes all evaluation cases
-- ✅ Generates a timestamped machine-readable result
-- ✅ Runs the complete project test suite
+| Required Deliverable | Location | Status |
+|----------------------|----------|--------|
+| Retrieval grader module | evals/retrieval_grader.py | ✅ Complete |
+| Answer grader module | evals/answer_grader.py | ✅ Complete |
+| Baseline evaluation scorecard | results/scorecards/scorecard_20260922T065158Z.json | ✅ Complete |
+| Per-case failure report | results/eval_reports/report_20260922T114940Z.md | ✅ Complete |
+| Regression thresholds | evals/regression_thresholds.json | ✅ Complete |
+| One-command quality check | evals/check_regression.py | ✅ Complete |
 
----
+## 19. ✅ Day 14 Completion Gate
 
-## 📦 Deliverables
+The roadmap defines four completion-gate requirements.
 
-| Deliverable | Location | Status |
-|-------------|----------|--------|
-| Golden evaluation dataset | `datasets/golden_set.jsonl` | ✅ Complete |
-| Evaluation runner | `evals/run_evals.py` | ✅ Complete |
-| Golden-set validator | `scripts/validate_golden_set.py` | ✅ Complete |
-| Review documentation | `docs/day13_golden_set_review.md` | ✅ Complete |
-| Machine-readable evaluation results | `results/eval_runs/` | ✅ Complete |
+| Completion Gate | Evidence | Status |
+|-----------------|----------|--------|
+| Retrieval and answer failures are reported separately | Separate retrieval and answer grader results in the scorecard/report | ✅ |
+| Scorecard is generated automatically from run results | generate_scorecard.py and baseline scorecard artifact | ✅ |
+| At least the top three failure categories are identified | 3 categories identified in baseline | ✅ |
+| Deliberately weakened configuration triggers regression failure | Regression failure behavior was tested | ✅ |
 
----
+## 20. 📋 Day 14 Final Verification Checklist
 
-## ✅ Completion Checklist
+### Retrieval Quality
 
-### Dataset
-- ✅ Evaluation case format defined
-- ✅ 25 golden-set cases created
-- ✅ Answerable cases included
-- ✅ Unanswerable cases included
-- ✅ Ambiguous cases included
-- ✅ Multi-document cases included
-- ✅ Adversarial cases included
-- ✅ Approved Day 5 corpus used
-- ✅ Every answerable case has expected source(s)
+- Retrieval grader implemented.
+- Expected source matching implemented.
+- Hit Rate implemented.
+- Recall@K implemented.
+- MRR implemented.
+- Retrieval pass/fail recorded separately from answer quality.
 
-### Review
-- ✅ Golden set manually self-reviewed
-- ✅ Review documentation completed
-- ✅ No incorrect source mappings identified
-- ✅ No cases required correction
+### Answer Quality
 
-### Evaluation Runner
-- ✅ Evaluation runner implemented
-- ✅ All 25 cases executed
-- ✅ No manual intervention required
-- ✅ Answers recorded
-- ✅ Citations recorded
-- ✅ Retrieval results recorded
-- ✅ Status recorded
-- ✅ Latency recorded
-- ✅ Model version recorded
-- ✅ Prompt version recorded
-- ✅ Configuration recorded
-- ✅ Errors recorded
+- Answerability grading implemented.
+- Citation presence check implemented.
+- Citation validity check implemented.
+- Required-facts check implemented where facts are available.
+- Unsupported-question abstention check implemented.
+- Answer pass/fail recorded separately from retrieval quality.
 
-### Results & Verification
-- ✅ Golden-set validation passed
-- ✅ Timestamped machine-readable result generated
-- ✅ Previous evaluation artifacts preserved
-- ✅ Full project test suite passed
+### Reporting
 
----
+- Per-case report generated.
+- Retrieval result included.
+- Answer result included.
+- Latency included.
+- Failure category included.
+- 25 cases included in the baseline report.
 
-## 📈 Final Verification Summary
+### Scorecard
 
-| Metric | Result |
-|--------|--------|
-| Golden-set cases | 25 |
-| Answerable | 10 |
-| Multi-document | 5 |
-| Ambiguous | 4 |
-| Unanswerable | 3 |
-| Adversarial | 3 |
-| Cases executed | 25/25 |
-| Golden-set validation | ✅ PASSED |
-| Full test suite | ✅ 28/28 PASSED |
-| Latest evaluation run | `eval_20260917T082522Z.json` |
-| Model version | `openrouter/free` |
-| Prompt version | `v1` |
-| Top-K retrieval | 3 |
+- Answer pass rate included.
+- Retrieval metrics included.
+- Citation correctness included.
+- Answerability accuracy included.
+- Abstention accuracy included.
+- Failure categories included.
+- Top three failure categories identified.
+- Latency included.
+- Cost proxy included.
+- Weakest component identified from measured evidence.
 
----
+### Regression
 
-## 🎯 Status: ✅ COMPLETE
+- Minimum quality thresholds defined.
+- Average latency threshold defined.
+- One-command regression check implemented.
+- PASS/FAIL status implemented.
+- Deliberately weakened configuration tested.
+- Valid baseline passes all configured thresholds.
 
-✅ Golden set created
-✅ Reviewed and validated
-✅ Evaluation runner implemented
-✅ All cases executed
-✅ Results generated and preserved
-✅ Full test suite passing
+## 21. 🏆 Day 14 Final Evidence Summary
+
+| Evidence | Verified Result |
+|----------|-----------------|
+| Evaluation cases | 25 |
+| Answer pass rate | 80.00% |
+| Retrieval Hit Rate | 87.50% |
+| Recall@K | 86.11% |
+| MRR | 85.42% |
+| Citation correctness | 100% |
+| Answerability accuracy | 80.00% |
+| Abstention accuracy | 100% |
+| Average latency | 12.9992 seconds |
+| Top failure categories | 3 identified |
+| Weakest component | Answer quality — 0.80 |
+| Regression quality gate | PASSED |
+| Baseline scorecard | Generated |
+| Per-case failure report | Generated |
 
 ---
 
-## 📚 Additional Resources
+## 🎯 Day 14 Status: ✅ COMPLETE
 
-- **Review Documentation:** `docs/day13_golden_set_review.md`
-- **Latest Results:** `results/eval_runs/eval_20260917T082522Z.json`
-- **Source Corpus:** `sample_data/day5_documents/`
-- **Test Suite:** `pytest.ini` and `tests/`
+Retrieval graded • Answers graded • Scorecard generated • Failures analyzed • Regression thresholds enforced • Quality gate passed
 
----
-
-## 📞 Support
-
-For questions or issues:
-1. Review the verification commands above
-2. Check the review documentation in `docs/day13_golden_set_review.md`
-3. Inspect the latest evaluation artifact in `results/eval_runs/`
-4. Run the validator: `python scripts/validate_golden_set.py`
-
----
-
-**Last Updated:** September 17, 2026
-**Project:** GenAI Engineering Roadmap
-**Day:** 13
+Day 14 is complete based on the implemented graders, verified baseline scorecard, generated per-case report, regression thresholds, and successful one-command quality check.

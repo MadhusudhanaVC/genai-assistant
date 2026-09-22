@@ -13,6 +13,8 @@ if str(BASE_DIR) not in sys.path:
 
 from app.llm.client import MODEL_VERSION
 from app.rag.generate import PROMPT_VERSION, generate_grounded_answer
+from evals.answer_grader import grade_answer
+from evals.retrieval_grader import grade_retrieval
 
 
 GOLDEN_SET_PATH = BASE_DIR / "datasets" / "golden_set.jsonl"
@@ -54,6 +56,8 @@ def evaluate_case(case: dict) -> dict:
         "actual_status": None,
         "actual_citations": [],
         "retrieval_results": [],
+        "retrieval_grade": None,
+        "answer_grade": None,
         "latency_seconds": None,
         "model_version": MODEL_VERSION,
         "prompt_version": PROMPT_VERSION,
@@ -69,22 +73,52 @@ def evaluate_case(case: dict) -> dict:
             min_score=MIN_SCORE,
         )
 
-        result["actual_answer"] = result_data.get("answer")
-        result["actual_status"] = result_data.get("status")
+        result["actual_answer"] = result_data.get(
+            "answer",
+        )
+
+        result["actual_status"] = result_data.get(
+            "status",
+        )
+
         result["actual_citations"] = result_data.get(
             "citations",
             [],
         )
+
         result["retrieval_results"] = result_data.get(
             "sources",
             [],
         )
+
+        result["retrieval_grade"] = grade_retrieval(
+            expected_source_ids=case["expected_source_ids"],
+            retrieved_results=result["retrieval_results"],
+        )
+
+        result["answer_grade"] = grade_answer(
+    expected_answerability=case["answerability"],
+    actual_status=result["actual_status"],
+    actual_citations=result["actual_citations"],
+    retrieval_results=result["retrieval_results"],
+    actual_answer=result["actual_answer"],
+    expected_facts=case.get("expected_facts", []),
+    error=result["error"],
+	)
 
     except Exception as error:
         result["error"] = {
             "type": type(error).__name__,
             "message": str(error),
         }
+
+        result["answer_grade"] = grade_answer(
+            expected_answerability=case["answerability"],
+            actual_status=result["actual_status"],
+            actual_citations=result["actual_citations"],
+            retrieval_results=result["retrieval_results"],
+            error=result["error"],
+        )
 
     result["latency_seconds"] = round(
         time.perf_counter() - started_at,
