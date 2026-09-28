@@ -1,3 +1,4 @@
+
 import app.rag.generate as grounded_generation
 
 
@@ -20,7 +21,11 @@ def test_answerable_question_returns_cited_answer(monkeypatch):
     ):
         return retrieved_results
 
-    def fake_generate_response(prompt):
+    def fake_generate_response(prompt, system_prompt=None):
+        # Verify that the trusted system prompt is provided separately.
+        assert system_prompt is not None
+        assert isinstance(prompt, str)
+
         return {
             "model": "test-model",
             "latency_seconds": 0.01,
@@ -48,15 +53,10 @@ def test_answerable_question_returns_cited_answer(monkeypatch):
     )
 
     assert result["status"] == "answered"
-
-    assert result["answer"] == (
-        "A Python variable stores a value."
-    )
-
+    assert result["answer"] == "A Python variable stores a value."
     assert result["citations"] == [
         "[DOC001 | DOC001_CHUNK_001]"
     ]
-
     assert result["sources"] == retrieved_results
 
 
@@ -84,7 +84,11 @@ def test_partially_answerable_question_uses_supported_evidence(
     ):
         return retrieved_results
 
-    def fake_generate_response(prompt):
+    def fake_generate_response(prompt, system_prompt=None):
+        # The system instructions must be separate from user/context input.
+        assert system_prompt is not None
+        assert isinstance(prompt, str)
+
         return {
             "model": "test-model",
             "latency_seconds": 0.01,
@@ -114,9 +118,7 @@ def test_partially_answerable_question_uses_supported_evidence(
     )
 
     assert result["status"] == "answered"
-
     assert "reusable blocks of code" in result["answer"]
-
     assert result["citations"] == [
         "[DOC002 | DOC002_CHUNK_001]"
     ]
@@ -130,7 +132,7 @@ def test_unanswerable_question_abstains(monkeypatch):
     ):
         return []
 
-    def fake_generate_response(prompt):
+    def fake_generate_response(prompt, system_prompt=None):
         raise AssertionError(
             "LLM should not be called when there is no evidence."
         )
@@ -152,11 +154,8 @@ def test_unanswerable_question_abstains(monkeypatch):
     )
 
     assert result["status"] == "insufficient_evidence"
-
     assert result["citations"] == []
-
     assert result["sources"] == []
-
     assert result["answer"] == (
         grounded_generation.ABSTENTION_MESSAGE
     )

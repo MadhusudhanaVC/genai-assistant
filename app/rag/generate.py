@@ -10,7 +10,7 @@ from app.rag.reranker import rerank_documents
 DEFAULT_MAX_CONTEXT_CHUNKS = 3
 DEFAULT_MAX_CONTEXT_CHARACTERS = 6000
 DEFAULT_INITIAL_RETRIEVAL_K = 5
-PROMPT_VERSION = "v1"
+PROMPT_VERSION = "v2"
 ABSTENTION_MESSAGE = (
     "There is not enough evidence in the provided documents to answer this question."
 )
@@ -76,6 +76,28 @@ def prepare_context(
     return "\n\n---\n\n".join(context_parts)
 
 
+def build_system_prompt() -> str:
+    prompt_path = Path("prompts/grounded_answer.txt")
+
+    prompt_template = prompt_path.read_text(
+        encoding="utf-8"
+    )
+
+    rules_start = prompt_template.index(
+        "You are a grounded question-answering assistant."
+    )
+
+    user_question_marker = "\nUser question\n=============="
+
+    rules = prompt_template[
+        rules_start:prompt_template.index(
+            user_question_marker
+        )
+    ]
+
+    return rules.strip()
+
+
 def build_grounded_prompt(
     question: str,
     context: str,
@@ -86,10 +108,24 @@ def build_grounded_prompt(
         encoding="utf-8"
     )
 
-    return prompt_template.format(
-        question=question,
-        context=context,
+    user_question_marker = "\nUser question\n=============="
+
+    user_template = prompt_template[
+        prompt_template.index(user_question_marker)
+        + len(user_question_marker):
+    ]
+
+    user_template = user_template.replace(
+        "{question}",
+        question,
     )
+
+    user_template = user_template.replace(
+        "{context}",
+        context,
+    )
+
+    return user_template.strip()
 
 
 def validate_citations(
@@ -205,11 +241,16 @@ def generate_grounded_answer(
         context=context,
     )
 
+    system_prompt = build_system_prompt()
+
     if stage_logger:
         stage_logger("GENERATION", "STARTED")
 
     try:
-        response = generate_response(prompt)
+        response = generate_response(
+            prompt,
+            system_prompt=system_prompt,
+        )
 
         is_valid, validated, error = validate_response(
             "grounded_answer",

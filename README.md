@@ -1,616 +1,319 @@
-# Day 14 — Graders, Scorecard & Regression Checks
+# Day 15: Adversarial Testing & Prompt Injection Protection
 
-GenAI Engineering Roadmap · Day 14 Documentation
+## Overview
 
-Day 14 focuses on separating retrieval quality from answer quality and building an automated quality gate for the RAG pipeline.
+Day 15 strengthens the GenAI assistant against adversarial and malformed inputs while preserving the expected behavior of the retrieval-augmented generation (RAG) pipeline. The implementation introduces a 10-case adversarial test suite, explicit input validation, instruction-hierarchy protections, and structured guardrail decision logging.
 
-The implementation adds retrieval graders, answer graders, a review-friendly evaluation report, an automated scorecard, regression thresholds, and a one-command regression check.
+The objective is to prevent hostile instructions from overriding application rules, return controlled responses for malformed requests, and ensure benign questions can still reach the RAG pipeline. Automated tests verify these protections without making live LLM calls.
 
-## 📌 Practical Goal
+## Contents
 
-Separate retrieval quality from answer quality and produce a scorecard that guides the next improvement.
+- [Practical Goal](#practical-goal)
+- [RAG Architecture Context](#rag-architecture-context)
+- [Day 15 Objectives](#1-day-15-objectives)
+- [Input Validation & Guardrails](#2-input-validation--guardrails)
+- [Instruction Hierarchy Protection](#3-instruction-hierarchy-protection)
+- [Adversarial Test Suite](#4-adversarial-test-suite)
+- [Guardrail Decision Logging](#5-guardrail-decision-logging)
+- [Baseline Results](#6-baseline-results)
+- [Verification & Completion Evidence](#7-verification--completion-evidence)
 
-## 1. 🎯 Day 14 Objectives
+---
 
-The Day 14 implementation covers the following roadmap requirements:
+## Practical Goal
 
-- Implement retrieval graders.
-- Measure expected-source retrieval using Hit Rate, Recall@K, and MRR.
-- Implement answer-quality checks.
-- Check answerability status.
-- Check citation presence and citation validity.
-- Check required facts where available.
-- Check correct abstention for unsupported questions.
-- Generate review-friendly per-case evaluation output.
-- Generate an automated quality scorecard.
-- Identify common failure categories.
-- Track latency and a cost proxy.
-- Define regression thresholds.
-- Return a failing process status when a critical threshold is broken.
+Prevent malformed or hostile inputs from bypassing application rules while allowing benign questions to continue through the RAG pipeline.
 
-## 2. 📁 Day 14 Project Structure
+## RAG Architecture Context
 
+Day 15 builds on the existing Day 14 RAG pipeline. Day 14's evaluation work separates retrieval quality from answer quality and provides reports, scorecards, and regression checks to assess pipeline behavior. This is useful context for Day 15 because security controls must protect the assistant without breaking normal retrieval and grounded answering.
+
+At a high level, the request flow is:
+
+1. **API request validation** — validate the incoming question and request parameters.
+2. **Day 15 guardrail evaluation** — check the question for invalid or adversarial input before generation.
+3. **RAG retrieval and context preparation** — retrieve relevant evidence and prepare bounded context for the answer.
+4. **Grounded generation** — keep application instructions separate from the user question and retrieved text.
+5. **Response and decision logging** — return a controlled response and record the guardrail control, outcome, and reason code without storing the question in the guardrail-decision record.
+
+Day 14's evaluation reports and regression checks provide quality evidence for the RAG pipeline; Day 15's adversarial tests and guardrails add security evidence. Both matter: a secure assistant should resist hostile input while still allowing benign questions to reach RAG.
+
+## 1. Day 15 Objectives
+
+The Day 15 implementation covers the following requirements:
+
+- Create a 10-case adversarial test suite.
+- Check direct prompt injection and attempts to extract restricted instructions.
+- Treat instructions found in retrieved documents as untrusted content.
+- Validate request fields and reject malformed question values.
+- Enforce a maximum question length.
+- Reject requests detected by the input guardrails before RAG generation.
+- Keep trusted system instructions separate from user questions and retrieved context.
+- Limit the size of retrieved context passed to generation.
+- Record guardrail decisions using a control, outcome, reason code, request ID, and timestamp.
+- Test that guardrail behavior does not prevent benign questions from reaching RAG.
+
+## 2. 🛡️ Guardrail and Request-Validation Flow
+
+The `/ask` endpoint evaluates the incoming question before starting RAG generation.
+
+```text
+Incoming request
+      |
+      v
+API request validation
+      |
+      v
+Input guardrail evaluation
+      |
+      +---- Blocked request ----> Controlled error response
+      |
+      v
+Allowed question
+      |
+      v
+RAG retrieval and context preparation
+      |
+      v
+Grounded answer generation
+      |
+      v
+Response returned
 ```
+
+The guardrail implementation is located in:
+
+`app/safety/guardrails.py`
+
+The API integration is in:
+
+`app/api/routes.py`
+
+The implementation includes a maximum question length of 2,000 characters and checks for suspicious prompt-injection patterns. Requests rejected by the guardrail are blocked before answer generation.
+
+## 3. 🔐 Instruction-Hierarchy Protection
+
+The generation flow separates trusted system instructions from the user question and retrieved context.
+
+Relevant implementation files:
+
+- `prompts/grounded_answer.txt`
+- `app/rag/generate.py`
+- `app/llm/client.py`
+
+The system instructions define how the assistant should behave. User input and retrieved document text are treated as untrusted data and must not override those instructions.
+
+Retrieved documents can provide evidence for an answer, but instructions contained inside those documents are not application commands. The prompt explicitly directs the model to ignore instructions embedded in retrieved content.
+
+The LLM client supports a separate `system_prompt` argument so the trusted system message is sent separately from the user/context message.
+
+## 4. 📏 Context and Input Limits
+
+The Day 15 implementation adds limits and checks intended to reduce malformed or excessive input reaching generation.
+
+| Control | Purpose |
+|---|---|
+| Question type and field validation | Reject malformed request values |
+| Maximum question length | Reject questions exceeding 2,000 characters |
+| Injection-pattern detection | Block requests matching configured suspicious patterns |
+| Retrieved-context limits | Cap context at 3 chunks and 6,000 characters |
+| Context preparation validation | Validate positive limits and deduplicate context |
+
+The guardrails are defensive controls, not a guarantee that every possible prompt injection will be detected. The adversarial tests document the specific behaviors covered by the current implementation.
+
+## 5. 🧪 Adversarial Test Suite
+
+The adversarial suite is implemented in:
+
+`tests/test_adversarial.py`
+
+It contains 10 cases:
+
+| # | Test case | Expected behavior |
+|---:|---|---|
+| 1 | Direct prompt injection | Block the hostile request |
+| 2 | Attempt to extract system instructions | Block the restricted request |
+| 3 | Malicious instructions in retrieved text | Treat the text as data, not instructions |
+| 4 | Restricted-data request | Block the request |
+| 5 | Irrelevant context | Avoid an unsupported answer |
+| 6 | Conflicting sources | Retain the sources as evidence rather than treating one as an instruction |
+| 7 | Unsupported request | Abstain when evidence is insufficient |
+| 8 | Excessive input | Reject input exceeding the configured limit |
+| 9 | Malformed question type | Return controlled request validation |
+| 10 | Benign question | Allow the question to reach RAG |
+
+These tests use controlled test doubles where appropriate; the test suite does not require live LLM calls.
+
+## 6. 🧾 Guardrail Decision Logging
+
+Guardrail decisions are recorded through the database model and CRUD integration.
+
+Relevant files:
+
+- `app/db/models.py`
+- `app/db/crud.py`
+- `app/api/routes.py`
+
+The decision record includes:
+
+- `request_id`
+- `control`
+- `outcome`
+- `reason_code`
+- `timestamp`
+
+The guardrail decision table does not include a field for storing the full question or prompt. This limits what is stored in this particular audit record; it does not by itself establish that no other application logs contain request content.
+
+Logging tests are in:
+
+`tests/test_guardrail_logging.py`
+
+## 7. 📁 Day 15 Project Structure
+
+```text
 genai-assistant/
-│
 ├── app/
-│   └── ...                         # Existing RAG application
-│
-├── datasets/
-│   └── golden_set.jsonl            # 25-case Day 13 evaluation dataset
-│
-├── docs/
-│   └── day13_golden_set_review.md  # Day 13 review documentation
-│
-├── evals/
-│   ├── answer_grader.py            # Day 14 answer-quality graders
-│   ├── check_regression.py         # Day 14 regression quality gate
-│   ├── generate_eval_report.py     # Day 14 per-case report generator
-│   ├── generate_scorecard.py       # Day 14 automated scorecard generator
-│   ├── regression_thresholds.json  # Day 14 minimum quality thresholds
-│   ├── retrieval_grader.py         # Day 14 retrieval graders
-│   └── run_evals.py                # Evaluation runner
-│
-├── results/
-│   ├── eval_runs/                  # Timestamped evaluation results
-│   ├── eval_reports/               # Day 14 per-case evaluation reports
-│   └── scorecards/                 # Day 14 scorecard artifacts
-│
+│   ├── api/
+│   │   ├── errors.py                 # Controlled API errors
+│   │   └── routes.py                 # Guardrail integration in /ask
+│   ├── db/
+│   │   ├── crud.py                   # Guardrail decision logging
+│   │   └── models.py                 # Guardrail decision model
+│   ├── llm/
+│   │   └── client.py                 # Separate system/user messages
+│   ├── rag/
+│   │   └── generate.py               # Grounded generation and context
+│   └── safety/
+│       └── guardrails.py             # Input validation and guardrails
 ├── prompts/
-│   └── grounded_answer.txt
-│
-├── tests/
-│   └── ...
-│
-├── scripts/
-│   └── ...
-│
-├── .env.example
-├── genai.db
-├── pyproject.toml
-└── README.md
+│   └── grounded_answer.txt           # Grounding and hierarchy instructions
+├── results/
+│   └── eval_reports/
+│       └── day15_baseline_report.md  # Baseline findings and limitations
+└── tests/
+    ├── test_adversarial.py
+    ├── test_guardrail_logging.py
+    ├── test_guardrails.py
+    ├── test_llm_instruction_hierarchy.py
+    └── test_prompt_security.py
 ```
 
-check_regression_backup.py is a local backup of the regression checker and is not a required Day 14 deliverable.
+This is a focused overview of the Day 15 files, not an exhaustive listing of every file in the repository.
 
-## 3. 🧩 Day 14 Components
+## 8. ✅ Automated Verification
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| Retrieval Grader | evals/retrieval_grader.py | Measures expected-source retrieval quality |
-| Answer Grader | evals/answer_grader.py | Measures answerability, citations, facts, and abstention |
-| Evaluation Runner | evals/run_evals.py | Executes the golden-set evaluation |
-| Evaluation Report Generator | evals/generate_eval_report.py | Creates per-case review output |
-| Scorecard Generator | evals/generate_scorecard.py | Creates the automated quality scorecard |
-| Regression Thresholds | evals/regression_thresholds.json | Defines minimum acceptable quality |
-| Regression Checker | evals/check_regression.py | Enforces quality thresholds with PASS/FAIL status |
-| Evaluation Runs | results/eval_runs/ | Stores timestamped evaluation results |
-| Evaluation Reports | results/eval_reports/ | Stores review-friendly reports |
-| Scorecards | results/scorecards/ | Stores timestamped scorecards |
+The following tests were run in the Day 15 workspace.
 
-## 4. 🔎 Retrieval Graders
+| Test group | Verified result |
+|---|---:|
+| Full test suite: `python -m pytest tests/ -v` | **58 passed, 0 failed** |
+| Adversarial suite: `tests/test_adversarial.py` | **10 passed** |
+| Guardrail logging: `tests/test_guardrail_logging.py` | **3 passed** |
+| Guardrails, prompt security, and instruction hierarchy | **16 passed** |
+| Focused injection-blocking and benign-input evidence | **2 passed, 8 deselected** |
+| `git diff --check` | No whitespace errors; Windows line-ending warnings only |
 
-The retrieval grader is implemented in:
+The adversarial and guardrail tests use mocks/test doubles as appropriate; no live LLM calls were used for these test runs.
 
-`evals/retrieval_grader.py`
+### Key Evidence
 
-It evaluates whether expected source documents appear in the retrieved top-k results.
+- **Injection blocked:** The direct prompt-injection test passed.
+- **Benign input allowed:** The benign-question test passed and verified that the question reaches RAG.
+- **Malformed input controlled:** Validation and guardrail tests passed.
+- **Decision logging covered:** Guardrail logging tests passed.
 
-### Retrieval Metrics
+These results verify the behaviors covered by the tests; they do not prove that every possible adversarial input will be blocked.
 
-#### Hit Rate
+## 9. 📋 Day 15 Baseline Report
 
-Checks whether at least one expected source appears in the retrieved results.
+The baseline report is stored at:
 
-```
-Hit Rate = 1 when at least one expected source is retrieved
-           0 otherwise
-```
+`results/eval_reports/day15_baseline_report.md`
 
-#### Recall@K
+The report records the Day 14 baseline commit and distinguishes source-code inspection from runtime test evidence.
 
-Measures how many of the expected source documents were retrieved within the evaluated top-k results.
+The baseline full test suite could not be completed because test collection encountered OpenAI client initialization errors when `OPENAI_API_KEY` was not configured. Independent baseline tests also exposed a missing SQLite table, and the baseline API tests passed after the database tables were initialized.
 
-```
-Recall@K = retrieved expected sources / total expected sources
-```
+The baseline workspace database was modified during this investigation to create missing tables. Therefore, it should not be described as an untouched baseline database.
 
-#### Mean Reciprocal Rank (MRR)
+A later evaluation report containing 25 `evaluation_error` results is not evidence that the baseline accepted adversarial requests. The report does not establish attack success or refusal behavior for those cases.
 
-Measures the reciprocal rank of the first retrieved expected source.
+## 10. 📦 Day 15 Deliverables
 
-```
-MRR = 1 / rank of the first relevant result
-```
+| Deliverable | Location | Evidence |
+|---|---|---|
+| Adversarial test suite | `tests/test_adversarial.py` | 10 tests passed |
+| Input guardrails | `app/safety/guardrails.py` | Guardrail tests passed |
+| Controlled API errors | `app/api/errors.py`, `app/main.py` | API and validation tests passed |
+| Instruction-hierarchy protection | `prompts/grounded_answer.txt`, `app/rag/generate.py`, `app/llm/client.py` | Prompt-security and hierarchy tests passed |
+| Guardrail decision logging | `app/db/models.py`, `app/db/crud.py` | 3 logging tests passed |
+| Baseline findings | `results/eval_reports/day15_baseline_report.md` | Limitations and evidence recorded |
 
-If no expected source is retrieved, the MRR is 0.0.
+## 11. 🧪 Day 15 Verification Commands
 
-### Retrieval Grader Output
+Run these commands from the project root with the project virtual environment activated.
 
-Each graded case includes:
-
-- hit_rate
-- recall_at_k
-- mrr
-- passed
-
-A retrieval case passes when at least one expected source is retrieved.
-
-## 5. 📝 Answer Graders
-
-The answer grader is implemented in:
-
-`evals/answer_grader.py`
-
-It separates answer quality from retrieval quality.
-
-### 5.1 Answerability Check
-
-Expected and actual answerability are compared using the evaluation case definition.
-
-Supported statuses include:
-
-- answered
-- insufficient_evidence
-
-For ambiguous cases, both an answered response and an insufficient-evidence response can be accepted according to the evaluation logic.
-
-### 5.2 Citation Presence
-
-The grader checks whether citations are present when an answer is returned.
-
-For an answered response:
-
-- At least one citation is required.
-
-For an insufficient_evidence response:
-
-- No citations are expected.
-
-### 5.3 Citation Validity
-
-Citation references are checked against the retrieved source information and expected citation structure.
-
-The baseline evaluation recorded:
-
-- Checked citations : 27
-- Valid citations   : 27
-- Correctness       : 1.0
-
-### 5.4 Required Facts
-
-Where expected facts are available, the grader checks whether the required fact text is present in the generated answer.
-
-Cases without expected facts are not forced through a required-facts check.
-
-The required-facts logic was also tested against a negative example to prevent unrelated text from being treated as a valid required fact.
-
-### 5.5 Unsupported-Question Abstention
-
-Unsupported questions must correctly use the insufficient-evidence path rather than producing an unsupported answer.
-
-The baseline achieved:
-
-- Correct abstentions : 3 / 3
-- Abstention accuracy : 1.0
-
-## 6. 📊 Review-Friendly Evaluation Report
-
-The per-case report generator is:
-
-`evals/generate_eval_report.py`
-
-It produces a review-friendly report containing:
-
-| Field | Description |
-|-------|-------------|
-| Case | Evaluation case ID |
-| Retrieval | Retrieval pass/fail result |
-| Answer | Answer-quality pass/fail result |
-| Latency | Case execution latency |
-| Failure Category | Primary failure category |
-| Details | Additional per-case grading information |
-
-### Final Baseline Report
-
-The report was generated from the valid baseline evaluation run:
-
-`results/eval_runs/eval_20260922T065158Z.json`
-
-Generated report:
-
-`results/eval_reports/report_20260922T114940Z.md`
-
-The report contains results for all:
-
-- 25 cases
-
-## 7. 📈 Automated Scorecard
-
-The scorecard generator is:
-
-`evals/generate_scorecard.py`
-
-It summarizes the evaluation run into a machine-readable quality scorecard.
-
-### Scorecard Metrics
-
-The scorecard contains:
-
-- Total cases
-- Answer grading pass rate
-- Retrieval pass rate
-- Hit Rate
-- Recall@K
-- MRR
-- Citation correctness
-- Answerability accuracy
-- Abstention accuracy
-- Average latency
-- Maximum latency
-- Failure categories
-- Top three failure categories
-- Component-level quality metrics
-- Weakest component
-- LLM-call cost proxy
-
-## 8. 🏁 Baseline Evaluation Scorecard
-
-The valid Day 14 baseline scorecard is:
-
-`results/scorecards/scorecard_20260922T065158Z.json`
-
-### Baseline Summary
-
-| Metric | Baseline Result |
-|--------|-----------------|
-| Total cases | 25 |
-| Answer pass rate | 0.8000 (80.00%) |
-| Retrieval pass rate | 0.8750 (87.50%) |
-| Retrieval Hit Rate | 0.8750 (87.50%) |
-| Recall@K | 0.8611 (86.11%) |
-| MRR | 0.8542 (85.42%) |
-| Citation correctness | 1.0000 (100%) |
-| Answerability accuracy | 0.8000 (80.00%) |
-| Abstention accuracy | 1.0000 (100%) |
-| Average latency | 12.9992 seconds |
-| Maximum latency | 100.167 seconds |
-| LLM-call cost proxy | 25 calls |
-
-## 9. 🚨 Failure Analysis
-
-The baseline scorecard identified the following failure categories:
-
-| Failure Category | Count |
-|------------------|-------|
-| Answerability mismatch | 4 |
-| Retrieval failure | 3 |
-| Evaluation error | 1 |
-
-### Top Three Failure Categories
-
-1. Answerability mismatch — 4 cases
-2. Retrieval failure — 3 cases
-3. Evaluation error — 1 case
-
-These categories are generated from the evaluation results rather than manually assigned.
-
-## 10. 🧭 Component Quality Analysis
-
-The scorecard calculates separate component metrics so retrieval and answer quality can be analyzed independently.
-
-| Component | Metric |
-|-----------|--------|
-| Answer quality | 0.8000 |
-| Retrieval quality | 0.8750 |
-| Citation quality | 1.0000 |
-| Abstention quality | 1.0000 |
-
-### Weakest Component
-
-- Component : Answer quality
-- Metric    : 0.8000
-
-Therefore, the Day 14 baseline evidence identifies answer quality as the weakest measured component.
-
-## 11. ⚙️ Regression Thresholds
-
-Regression thresholds are defined in:
-
-`evals/regression_thresholds.json`
-
-Current thresholds:
-
-```json
-{
-  "answer_pass_rate": 0.75,
-  "retrieval_hit_rate": 0.8,
-  "recall_at_k": 0.8,
-  "mrr": 0.8,
-  "citation_correctness": 0.95,
-  "answerability_accuracy": 0.75,
-  "abstention_accuracy": 0.75,
-  "max_average_latency_seconds": 20.0
-}
-```
-
-For quality metrics, the actual value must be greater than or equal to the configured minimum.
-
-For average latency, the actual value must be less than or equal to the configured maximum.
-
-## 12. 🛡️ One-Command Regression Quality Check
-
-The regression checker is:
-
-`evals/check_regression.py`
-
-Run it with:
+### Run the full test suite
 
 ```bash
-python evals\check_regression.py
+python -m pytest tests/ -v
 ```
 
-The checker:
+Expected result from the verified Day 15 run:
 
-- Finds available scorecards.
-- Skips provider/evaluation-error-only scorecards.
-- Loads the latest valid scorecard.
-- Loads the configured regression thresholds.
-- Checks every critical metric.
-- Prints PASS/FAIL for each threshold.
-- Returns a successful process status only when all checks pass.
-
-## 13. ✅ Verified Regression Check
-
-The valid baseline was checked against the Day 14 thresholds.
-
-```
-Answer pass rate: 0.8 (minimum 0.75) -> PASS
-Retrieval hit rate: 0.875 (minimum 0.8) -> PASS
-Recall@K: 0.8611 (minimum 0.8) -> PASS
-MRR: 0.8542 (minimum 0.8) -> PASS
-Citation correctness: 1.0 (minimum 0.95) -> PASS
-Answerability accuracy: 0.8 (minimum 0.75) -> PASS
-Abstention accuracy: 1.0 (minimum 0.75) -> PASS
-Average latency: 12.9992 (maximum 20.0) -> PASS
-REGRESSION CHECK PASSED
+```text
+58 passed, 0 failed
 ```
 
-The quality gate therefore passed for the valid baseline scorecard.
-
-## 14. 🧪 Regression Failure Test
-
-A deliberately weakened configuration was previously used to verify that the regression checker can detect a quality regression.
-
-The test demonstrated the required behavior:
-
-```
-Threshold broken
-       ↓
-Metric marked FAIL
-       ↓
-Overall regression check marked FAILED
-       ↓
-Non-zero failure status returned
-```
-
-After restoring the valid baseline scorecard and thresholds, the regression check returned:
-
-```
-REGRESSION CHECK PASSED
-```
-
-This satisfies the Day 14 requirement that a deliberately weakened configuration can trigger a regression failure.
-
-## 15. 🔄 Day 14 Evaluation Flow
-
-```
-┌─────────────────────────────────────┐
-│ datasets/golden_set.jsonl           │
-│ 25 evaluation cases                 │
-└──────────────────┬──────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────┐
-│ evals/run_evals.py                  │
-│ Execute RAG evaluation              │
-└──────────────────┬──────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────┐
-│ Retrieval Results + Generated Answer│
-│ Citations + Status + Latency        │
-└──────────────────┬──────────────────┘
-                   │
-          ┌────────┴────────┐
-          ▼                 ▼
-┌──────────────────┐ ┌────────────────────┐
-│ Retrieval Grader │ │ Answer Grader      │
-│ Hit Rate         │ │ Answerability      │
-│ Recall@K         │ │ Citation Presence │
-│ MRR              │ │ Citation Validity │
-└────────┬─────────┘ │ Required Facts    │
-         │           │ Abstention        │
-         │           └─────────┬──────────┘
-         └─────────────┬───────┘
-                       ▼
-┌─────────────────────────────────────┐
-│ generate_eval_report.py             │
-│ Per-case pass/fail + failure data   │
-└──────────────────┬──────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────┐
-│ generate_scorecard.py               │
-│ Aggregate quality metrics           │
-│ Failure categories + weakest area   │
-└──────────────────┬──────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────┐
-│ check_regression.py                 │
-│ Compare against thresholds          │
-└──────────────────┬──────────────────┘
-                   │
-                   ▼
-          ┌─────────────────┐
-          │ PASS / FAIL     │
-          │ Quality Gate    │
-          └─────────────────┘
-```
-
-## 16. 🧪 Day 14 Verification Commands
-
-### 16.1 Compile Grader and Evaluation Modules
+### Run the adversarial suite
 
 ```bash
-python -m py_compile evals\retrieval_grader.py
-python -m py_compile evals\answer_grader.py
-python -m py_compile evals\generate_eval_report.py
-python -m py_compile evals\generate_scorecard.py
-python -m py_compile evals\check_regression.py
+python -m pytest tests/test_adversarial.py -v
 ```
 
-All required modules compiled successfully during Day 14 verification.
+Expected result from the verified Day 15 run:
 
-### 16.2 Generate the Baseline Evaluation Report
+```text
+10 passed
+```
+
+### Verify the two key evidence cases
 
 ```bash
-python evals\generate_eval_report.py --input results\eval_runs\eval_20260922T065158Z.json
-```
-
-Verified output:
-
-```
-Evaluation report generated.
-Cases: 25
-Report: ...\results\eval_reports\report_20260922T114940Z.md
-```
-
-### 16.3 Run the Regression Quality Check
-
-```bash
-python evals\check_regression.py
+python -m pytest tests/test_adversarial.py -k "direct_prompt_injection_is_blocked or benign_question_reaches_rag" -v
 ```
 
 Verified result:
 
+```text
+2 passed, 8 deselected
 ```
-REGRESSION CHECK PASSED
-```
 
-## 17. ⚠️ Evaluation Provider Note
+## 12. 🏁 Day 15 Completion Gate
 
-During Day 14, the configured OpenRouter free-model provider reached its daily free-model quota.
+| Completion gate | Evidence | Status |
+|---|---|---|
+| Malformed inputs receive controlled responses | Request validation and guardrail tests | ✅ Verified |
+| Retrieved instructions do not replace application instructions | Separate system/user messages and hierarchy tests | ✅ Verified by tests |
+| Guardrail outcomes are covered by automated tests | Guardrail, adversarial, and logging tests | ✅ Verified |
+| Benign questions still reach RAG | Benign-input adversarial test | ✅ Verified |
 
-The direct provider test returned a rate-limit error indicating that the free-model daily request allowance had been exhausted.
+## 13. 🎯 Day 15 Final Evidence Summary
 
-Several later evaluation runs therefore contained provider/evaluation errors. These runs were not used as the Day 14 quality baseline.
-
-The valid baseline used for Day 14 reporting and regression verification is:
-
-- Evaluation run: `results/eval_runs/eval_20260922T065158Z.json`
-- Scorecard: `results/scorecards/scorecard_20260922T065158Z.json`
-- Report: `results/eval_reports/report_20260922T114940Z.md`
-
-The regression checker was updated so provider/evaluation-error-only scorecards are not selected as the quality baseline.
-
-## 18. 📦 Day 14 Required Deliverables
-
-| Required Deliverable | Location | Status |
-|----------------------|----------|--------|
-| Retrieval grader module | evals/retrieval_grader.py | ✅ Complete |
-| Answer grader module | evals/answer_grader.py | ✅ Complete |
-| Baseline evaluation scorecard | results/scorecards/scorecard_20260922T065158Z.json | ✅ Complete |
-| Per-case failure report | results/eval_reports/report_20260922T114940Z.md | ✅ Complete |
-| Regression thresholds | evals/regression_thresholds.json | ✅ Complete |
-| One-command quality check | evals/check_regression.py | ✅ Complete |
-
-## 19. ✅ Day 14 Completion Gate
-
-The roadmap defines four completion-gate requirements.
-
-| Completion Gate | Evidence | Status |
-|-----------------|----------|--------|
-| Retrieval and answer failures are reported separately | Separate retrieval and answer grader results in the scorecard/report | ✅ |
-| Scorecard is generated automatically from run results | generate_scorecard.py and baseline scorecard artifact | ✅ |
-| At least the top three failure categories are identified | 3 categories identified in baseline | ✅ |
-| Deliberately weakened configuration triggers regression failure | Regression failure behavior was tested | ✅ |
-
-## 20. 📋 Day 14 Final Verification Checklist
-
-### Retrieval Quality
-
-- Retrieval grader implemented.
-- Expected source matching implemented.
-- Hit Rate implemented.
-- Recall@K implemented.
-- MRR implemented.
-- Retrieval pass/fail recorded separately from answer quality.
-
-### Answer Quality
-
-- Answerability grading implemented.
-- Citation presence check implemented.
-- Citation validity check implemented.
-- Required-facts check implemented where facts are available.
-- Unsupported-question abstention check implemented.
-- Answer pass/fail recorded separately from retrieval quality.
-
-### Reporting
-
-- Per-case report generated.
-- Retrieval result included.
-- Answer result included.
-- Latency included.
-- Failure category included.
-- 25 cases included in the baseline report.
-
-### Scorecard
-
-- Answer pass rate included.
-- Retrieval metrics included.
-- Citation correctness included.
-- Answerability accuracy included.
-- Abstention accuracy included.
-- Failure categories included.
-- Top three failure categories identified.
-- Latency included.
-- Cost proxy included.
-- Weakest component identified from measured evidence.
-
-### Regression
-
-- Minimum quality thresholds defined.
-- Average latency threshold defined.
-- One-command regression check implemented.
-- PASS/FAIL status implemented.
-- Deliberately weakened configuration tested.
-- Valid baseline passes all configured thresholds.
-
-## 21. 🏆 Day 14 Final Evidence Summary
-
-| Evidence | Verified Result |
-|----------|-----------------|
-| Evaluation cases | 25 |
-| Answer pass rate | 80.00% |
-| Retrieval Hit Rate | 87.50% |
-| Recall@K | 86.11% |
-| MRR | 85.42% |
-| Citation correctness | 100% |
-| Answerability accuracy | 80.00% |
-| Abstention accuracy | 100% |
-| Average latency | 12.9992 seconds |
-| Top failure categories | 3 identified |
-| Weakest component | Answer quality — 0.80 |
-| Regression quality gate | PASSED |
-| Baseline scorecard | Generated |
-| Per-case failure report | Generated |
+| Evidence | Verified result |
+|---|---|
+| Adversarial cases | 10 tests passed |
+| Full test suite | 58 passed, 0 failed |
+| Direct prompt injection | Blocked in the tested case |
+| Benign question | Reached RAG in the tested case |
+| Guardrail decision logging | 3 tests passed |
+| Baseline report | Created with limitations documented |
+| Live LLM calls in Day 15 tests | None |
 
 ---
 
-## 🎯 Day 14 Status: ✅ COMPLETE
+## 🎯 Day 15 Status: ✅ VERIFIED BY AUTOMATED TESTS
 
-Retrieval graded • Answers graded • Scorecard generated • Failures analyzed • Regression thresholds enforced • Quality gate passed
+Input validation • Prompt-injection defenses • Instruction-hierarchy protection • Guardrail decision logging • Adversarial test coverage
 
-Day 14 is complete based on the implemented graders, verified baseline scorecard, generated per-case report, regression thresholds, and successful one-command quality check.
+Day 15 verification is based on the implemented controls and the recorded automated test results. The tests cover the defined cases and should not be interpreted as proof against every possible attack.

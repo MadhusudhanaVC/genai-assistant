@@ -21,15 +21,33 @@ class ProviderError(Exception):
     pass
 
 
-def generate_response(prompt: str) -> dict:
+def generate_response(
+    prompt: str,
+    system_prompt: str | None = None,
+) -> dict:
     start_time = time.perf_counter()
+
+    messages = []
+
+    if system_prompt:
+        messages.append(
+            {
+                "role": "system",
+                "content": system_prompt,
+            }
+        )
+
+    messages.append(
+        {
+            "role": "user",
+            "content": prompt,
+        }
+    )
 
     try:
         response = client.chat.completions.create(
             model=MODEL_NAME,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
+            messages=messages,
         )
 
     except Exception as error:

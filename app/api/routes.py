@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.db.crud import (
     get_document,
+    log_guardrail_decision,
     log_request_source,
     log_request_stage,
 )
@@ -15,6 +16,10 @@ from app.models.api import (
 )
 from app.rag.generate import generate_grounded_answer
 from app.rag.ingest import ingest_documents
+from app.safety.guardrails import (
+    GuardrailBlockedError,
+    evaluate_question,
+)
 
 
 def register_routes(app: FastAPI):
@@ -29,6 +34,19 @@ def register_routes(app: FastAPI):
         db: Session = Depends(get_db),
     ):
         request_id = request.state.request_id
+
+        decision = evaluate_question(body.question)
+
+        log_guardrail_decision(
+            db=db,
+            request_id=request_id,
+            control=decision.control,
+            outcome="ALLOWED" if decision.allowed else "BLOCKED",
+            reason_code=decision.reason_code,
+        )
+
+        if not decision.allowed:
+            raise GuardrailBlockedError(decision)
 
         def stage_logger(stage: str, status: str):
             log_request_stage(

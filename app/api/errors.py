@@ -1,7 +1,9 @@
 from fastapi import HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+
 from app.llm.client import ProviderError
+from app.safety.guardrails import GuardrailBlockedError
 
 
 def error_response(
@@ -60,6 +62,18 @@ async def provider_exception_handler(
         status_code=502,
         error_code="PROVIDER_ERROR",
         message="The language model provider could not complete the request.",
+    )
+
+
+async def guardrail_exception_handler(
+    request: Request,
+    exc: GuardrailBlockedError,
+):
+    return error_response(
+        request=request,
+        status_code=400,
+        error_code="GUARDRAIL_BLOCKED",
+        message="The request was blocked by a safety control.",
     )
 
 

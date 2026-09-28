@@ -142,3 +142,26 @@ def log_request_stage(
     except Exception:
         db.rollback()
         raise
+
+def log_guardrail_decision(
+    db: Session,
+    request_id: str,
+    control: str,
+    outcome: str,
+    reason_code: str,
+):
+    from app.db.models import GuardrailDecision
+
+    decision_log = GuardrailDecision(
+        request_id=request_id,
+        control=control,
+        outcome=outcome,
+        reason_code=reason_code,
+    )
+
+    try:
+        db.add(decision_log)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
