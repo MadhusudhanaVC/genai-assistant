@@ -1,3 +1,4 @@
+
 from pathlib import Path
 
 from app.llm.client import generate_response
@@ -11,6 +12,7 @@ DEFAULT_MAX_CONTEXT_CHUNKS = 3
 DEFAULT_MAX_CONTEXT_CHARACTERS = 6000
 DEFAULT_INITIAL_RETRIEVAL_K = 5
 PROMPT_VERSION = "v2"
+
 ABSTENTION_MESSAGE = (
     "There is not enough evidence in the provided documents to answer this question."
 )
@@ -76,12 +78,38 @@ def prepare_context(
     return "\n\n---\n\n".join(context_parts)
 
 
+def filter_usable_evidence(results: list[dict]) -> list[dict]:
+    """Keep only evidence chunks with valid IDs and non-empty text."""
+    usable_results = []
+    seen_chunks = set()
+
+    for result in results:
+        document_id = result.get("document_id")
+        chunk_id = result.get("chunk_id")
+        text = result.get("text")
+
+        if not isinstance(document_id, str) or not document_id.strip():
+            continue
+
+        if not isinstance(chunk_id, str) or not chunk_id.strip():
+            continue
+
+        if not isinstance(text, str) or not text.strip():
+            continue
+
+        if chunk_id in seen_chunks:
+            continue
+
+        usable_results.append(result)
+        seen_chunks.add(chunk_id)
+
+    return usable_results
+
+
 def build_system_prompt() -> str:
     prompt_path = Path("prompts/grounded_answer.txt")
 
-    prompt_template = prompt_path.read_text(
-        encoding="utf-8"
-    )
+    prompt_template = prompt_path.read_text(encoding="utf-8")
 
     rules_start = prompt_template.index(
         "You are a grounded question-answering assistant."
@@ -90,9 +118,7 @@ def build_system_prompt() -> str:
     user_question_marker = "\nUser question\n=============="
 
     rules = prompt_template[
-        rules_start:prompt_template.index(
-            user_question_marker
-        )
+        rules_start:prompt_template.index(user_question_marker)
     ]
 
     return rules.strip()
@@ -104,9 +130,7 @@ def build_grounded_prompt(
 ) -> str:
     prompt_path = Path("prompts/grounded_answer.txt")
 
-    prompt_template = prompt_path.read_text(
-        encoding="utf-8"
-    )
+    prompt_template = prompt_path.read_text(encoding="utf-8")
 
     user_question_marker = "\nUser question\n=============="
 
@@ -115,15 +139,8 @@ def build_grounded_prompt(
         + len(user_question_marker):
     ]
 
-    user_template = user_template.replace(
-        "{question}",
-        question,
-    )
-
-    user_template = user_template.replace(
-        "{context}",
-        context,
-    )
+    user_template = user_template.replace("{question}", question)
+    user_template = user_template.replace("{context}", context)
 
     return user_template.strip()
 
@@ -167,6 +184,16 @@ def build_grounded_result(
         "answer": answer,
         "status": status,
         "citations": validated_citations,
+        "sources": results,
+    }
+
+
+def build_abstention_result(results: list[dict]) -> dict:
+    """Return a consistent safe response when output validation fails."""
+    return {
+        "answer": ABSTENTION_MESSAGE,
+        "status": "insufficient_evidence",
+        "citations": [],
         "sources": results,
     }
 
@@ -222,6 +249,13 @@ def generate_grounded_answer(
 
         clean_results.append(clean_result)
 
+    # Reject malformed evidence before building the LLM context.
+    clean_results = filter_usable_evidence(clean_results)
+
+    # Abstain without calling the LLM if no usable evidence remains.
+    if not clean_results:
+        return build_abstention_result([])
+
     context = prepare_context(
         clean_results,
         max_chunks=max_chunks,
@@ -229,12 +263,7 @@ def generate_grounded_answer(
     )
 
     if not context:
-        return {
-            "answer": ABSTENTION_MESSAGE,
-            "status": "insufficient_evidence",
-            "citations": [],
-            "sources": [],
-        }
+        return build_abstention_result([])
 
     prompt = build_grounded_prompt(
         question=question,
@@ -246,30 +275,50 @@ def generate_grounded_answer(
     if stage_logger:
         stage_logger("GENERATION", "STARTED")
 
+    # Keep actual model/API failures distinguishable from invalid output.
     try:
         response = generate_response(
             prompt,
             system_prompt=system_prompt,
         )
-
-        is_valid, validated, error = validate_response(
-            "grounded_answer",
-            response["text"],
-        )
-
-        if not is_valid:
-            raise ValueError(
-                f"Invalid grounded answer response: {error}"
-            )
-
     except Exception:
         if stage_logger:
             stage_logger("GENERATION", "FAILED")
         raise
 
+    # Validate the returned response structure before reading its text.
+    if not isinstance(response, dict):
+        if stage_logger:
+            stage_logger("GENERATION", "FAILED")
+        return build_abstention_result(clean_results)
+
+    response_text = response.get("text")
+
+    if not isinstance(response_text, str) or not response_text.strip():
+        if stage_logger:
+            stage_logger("GENERATION", "FAILED")
+        return build_abstention_result(clean_results)
+
+    # Treat schema-invalid output as a controlled abstention.
+    try:
+        is_valid, validated, error = validate_response(
+            "grounded_answer",
+            response_text,
+        )
+    except Exception:
+        if stage_logger:
+            stage_logger("GENERATION", "FAILED")
+        return build_abstention_result(clean_results)
+
+    if not is_valid:
+        if stage_logger:
+            stage_logger("GENERATION", "FAILED")
+        return build_abstention_result(clean_results)
+
     if stage_logger:
         stage_logger("GENERATION", "SUCCESS")
 
+    # Validate citations before returning the answer.
     return build_grounded_result(
         answer=validated.answer,
         status=validated.status,
