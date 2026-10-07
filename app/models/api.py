@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 
@@ -5,18 +7,18 @@ class AskRequest(BaseModel):
     question: str = Field(
         ...,
         min_length=1,
-        description="Question to answer from the indexed documents",
+        description="User question",
     )
     top_k: int = Field(
         default=3,
         ge=1,
-        description="Maximum number of retrieved results",
+        description="Number of retrieved chunks",
     )
     min_score: float | None = Field(
         default=None,
         ge=0,
         le=1,
-        description="Optional minimum retrieval score",
+        description="Minimum retrieval score",
     )
 
 
@@ -25,6 +27,14 @@ class AskResponse(BaseModel):
     status: str
     citations: list[str]
     sources: list[dict]
+
+
+class VoiceAskResponse(BaseModel):
+    answer: str
+    status: str
+    citations: list[str]
+    sources: list[dict]
+    transcript: str
 
 
 class IngestResponse(BaseModel):

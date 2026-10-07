@@ -56,8 +56,9 @@ class RequestStage(Base):
     request_id = Column(String, nullable=False)
     stage = Column(String, nullable=False)
     status = Column(String, nullable=False)
+    latency_ms = Column(Integer, nullable=True)
+    details = Column(Text, nullable=True)
     timestamp = Column(DateTime, default=datetime.utcnow)
-
 
 class GuardrailDecision(Base):
     __tablename__ = "guardrail_decisions"

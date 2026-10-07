@@ -8,6 +8,7 @@ from app.db.models import (
     RequestStage,
 )
 
+
 def update_api_request(
     db: Session,
     request_id: str,
@@ -36,6 +37,7 @@ def update_api_request(
         db.rollback()
         raise
 
+
 def create_api_request(
     db: Session,
     request_id: str,
@@ -59,6 +61,7 @@ def create_api_request(
     except Exception:
         db.rollback()
         raise
+
 
 def save_document(db: Session, document):
     db_document = Document(
@@ -106,6 +109,7 @@ def log_event(
         db.rollback()
         raise
 
+
 def log_request_source(
     db: Session,
     request_id: str,
@@ -124,16 +128,22 @@ def log_request_source(
     except Exception:
         db.rollback()
         raise
+
+
 def log_request_stage(
     db: Session,
     request_id: str,
     stage: str,
     status: str,
+    latency_ms: int = None,
+    details: str = None,
 ):
     stage_log = RequestStage(
         request_id=request_id,
         stage=stage,
         status=status,
+        latency_ms=latency_ms,
+        details=details,
     )
 
     try:
@@ -142,6 +152,7 @@ def log_request_stage(
     except Exception:
         db.rollback()
         raise
+
 
 def log_guardrail_decision(
     db: Session,

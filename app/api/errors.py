@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 from app.llm.client import ProviderError
 from app.safety.guardrails import GuardrailBlockedError
+from app.voice.audio import STTProviderError
 
 
 def error_response(
@@ -62,6 +63,34 @@ async def provider_exception_handler(
         status_code=502,
         error_code="PROVIDER_ERROR",
         message="The language model provider could not complete the request.",
+    )
+
+
+async def stt_provider_exception_handler(
+    request: Request,
+    exc: STTProviderError,
+):
+    if exc.reason_code == "STT_CREDITS_REQUIRED":
+        status_code = 402
+        message = "Speech-to-text service credits are required."
+    elif exc.reason_code == "STT_AUTHENTICATION_ERROR":
+        status_code = 502
+        message = "Speech-to-text authentication failed."
+    elif exc.reason_code == "STT_RATE_LIMITED":
+        status_code = 429
+        message = "Speech-to-text service rate limit was reached."
+    elif exc.reason_code == "STT_NETWORK_ERROR":
+        status_code = 502
+        message = "Speech-to-text service could not be reached."
+    else:
+        status_code = 502
+        message = "Speech-to-text service could not complete the request."
+
+    return error_response(
+        request=request,
+        status_code=status_code,
+        error_code=exc.reason_code,
+        message=message,
     )
 
 
