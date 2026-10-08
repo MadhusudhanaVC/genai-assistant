@@ -44,7 +44,11 @@ async def http_exception_handler(
         message = "The requested document was not found."
     else:
         error_code = "HTTP_ERROR"
-        message = "The request could not be completed."
+        message = (
+            exc.detail
+            if isinstance(exc.detail, str)
+            else "The request could not be completed."
+        )
 
     return error_response(
         request=request,
@@ -52,7 +56,6 @@ async def http_exception_handler(
         error_code=error_code,
         message=message,
     )
-
 
 async def provider_exception_handler(
     request: Request,

@@ -1,17 +1,8 @@
-import base64
-import os
 import time
 from pathlib import Path
 
-import requests
-from dotenv import load_dotenv
+from faster_whisper import WhisperModel
 
-
-BASE_DIR = Path(__file__).resolve().parents[2]
-load_dotenv(BASE_DIR / ".env")
-
-STT_URL = "https://openrouter.ai/api/v1/audio/transcriptions"
-STT_MODEL = STT_MODEL = "openai/whisper-large-v3-turbo"
 
 MAX_AUDIO_SIZE_BYTES = 10 * 1024 * 1024
 
@@ -24,6 +15,10 @@ SUPPORTED_AUDIO_FORMATS = {
     ".webm": "webm",
     ".aac": "aac",
 }
+
+STT_MODEL = "small"
+STT_DEVICE = "cpu"
+STT_COMPUTE_TYPE = "int8"
 
 
 class AudioValidationError(Exception):
@@ -40,6 +35,22 @@ class STTProviderError(Exception):
         super().__init__(message)
         self.status_code = status_code
         self.reason_code = reason_code
+
+
+_model = None
+
+
+def get_stt_model() -> WhisperModel:
+    global _model
+
+    if _model is None:
+        _model = WhisperModel(
+            STT_MODEL,
+            device=STT_DEVICE,
+            compute_type=STT_COMPUTE_TYPE,
+        )
+
+    return _model
 
 
 def transcribe_audio(
@@ -73,91 +84,50 @@ def transcribe_audio(
             "Unsupported audio format."
         )
 
-    api_key = os.getenv("OPENROUTER_API_KEY")
-
-    if not api_key:
-        raise STTProviderError(
-            "OPENROUTER_API_KEY is not configured.",
-            reason_code="STT_CONFIGURATION_ERROR",
-        )
-
-    audio_bytes = path.read_bytes()
-
-    audio_base64 = base64.b64encode(
-        audio_bytes
-    ).decode("utf-8")
-
-    payload = {
-        "model": STT_MODEL,
-        "input_audio": {
-            "data": audio_base64,
-            "format": audio_format,
-        },
-    }
-
-    if language:
-        payload["language"] = language
-
     start_time = time.perf_counter()
 
     try:
-        response = requests.post(
-            STT_URL,
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json=payload,
-            timeout=120,
+        model = get_stt_model()
+
+        segments, info = model.transcribe(
+            str(path),
+            language=language,
         )
-    except requests.RequestException as error:
+
+        transcript = " ".join(
+            segment.text.strip()
+            for segment in segments
+            if segment.text.strip()
+        )
+
+    except Exception as error:
+        latency_ms = round(
+            (time.perf_counter() - start_time) * 1000
+        )
+
         raise STTProviderError(
-            "STT provider request failed.",
-            reason_code="STT_NETWORK_ERROR",
+            "Local STT transcription failed.",
+            reason_code="STT_LOCAL_ERROR",
         ) from error
 
     latency_ms = round(
         (time.perf_counter() - start_time) * 1000
     )
 
-    if not response.ok:
-        reason_code = "STT_PROVIDER_ERROR"
-
-        if response.status_code == 402:
-            reason_code = "STT_CREDITS_REQUIRED"
-        elif response.status_code == 401:
-            reason_code = "STT_AUTHENTICATION_ERROR"
-        elif response.status_code == 429:
-            reason_code = "STT_RATE_LIMITED"
-
+    if not transcript:
         raise STTProviderError(
-            f"STT provider returned HTTP {response.status_code}.",
-            status_code=response.status_code,
-            reason_code=reason_code,
-        )
-
-    try:
-        result = response.json()
-    except ValueError as error:
-        raise STTProviderError(
-            "STT provider returned invalid JSON.",
-            status_code=response.status_code,
-            reason_code="STT_INVALID_RESPONSE",
-        ) from error
-
-    transcript = result.get("text")
-
-    if not transcript or not transcript.strip():
-        raise STTProviderError(
-            "STT provider returned an empty transcript.",
-            status_code=response.status_code,
+            "Local STT returned an empty transcript.",
             reason_code="STT_EMPTY_TRANSCRIPT",
         )
 
-    detected_language = result.get("language") or language
+    detected_language = getattr(
+        info,
+        "language",
+        None,
+    ) or language
 
     return {
-        "text": transcript.strip(),
+        "text": transcript,
         "language": detected_language,
         "latency_ms": latency_ms,
         "model": STT_MODEL,

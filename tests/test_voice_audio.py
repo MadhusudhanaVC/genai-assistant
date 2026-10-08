@@ -39,34 +39,6 @@ def test_unsupported_audio_format(tmp_path: Path):
         transcribe_audio(str(audio_file))
 
 
-def test_stt_provider_402_error(
-    tmp_path: Path,
-    monkeypatch,
-):
-    audio_file = tmp_path / "sample.wav"
-    audio_file.write_bytes(b"fake audio data")
-
-    class FakeResponse:
-        status_code = 402
-        ok = False
-
-    def fake_post(*args, **kwargs):
-        return FakeResponse()
-
-    monkeypatch.setattr(
-        "app.voice.audio.requests.post",
-        fake_post,
-    )
-
-    with pytest.raises(STTProviderError) as exc_info:
-        transcribe_audio(str(audio_file))
-
-    error = exc_info.value
-
-    assert error.status_code == 402
-    assert error.reason_code == "STT_CREDITS_REQUIRED"
-
-
 def test_audio_file_size_limit(tmp_path: Path):
     audio_file = tmp_path / "large.wav"
     audio_file.write_bytes(
@@ -80,29 +52,35 @@ def test_audio_file_size_limit(tmp_path: Path):
         transcribe_audio(str(audio_file))
 
 
-def test_stt_provider_detected_language(
+def test_local_stt_transcription(
     tmp_path: Path,
     monkeypatch,
 ):
     audio_file = tmp_path / "sample.wav"
     audio_file.write_bytes(b"fake audio data")
 
-    class FakeResponse:
-        status_code = 200
-        ok = True
+    class FakeSegment:
+        def __init__(self, text):
+            self.text = text
 
-        def json(self):
-            return {
-                "text": "What is retrieval augmented generation?",
-                "language": "en",
-            }
+    class FakeInfo:
+        language = "en"
 
-    def fake_post(*args, **kwargs):
-        return FakeResponse()
+    class FakeModel:
+        def transcribe(self, audio_path, language=None):
+            assert audio_path == str(audio_file)
+            assert language is None
+
+            return (
+                [
+                    FakeSegment("What is retrieval augmented generation?")
+                ],
+                FakeInfo(),
+            )
 
     monkeypatch.setattr(
-        "app.voice.audio.requests.post",
-        fake_post,
+        "app.voice.audio.get_stt_model",
+        lambda: FakeModel(),
     )
 
     result = transcribe_audio(str(audio_file))
@@ -111,5 +89,100 @@ def test_stt_provider_detected_language(
         "What is retrieval augmented generation?"
     )
     assert result["language"] == "en"
-    assert result["model"] == "openai/whisper-large-v3-turbo"
+    assert result["model"] == "small"
     assert isinstance(result["latency_ms"], int)
+    assert result["latency_ms"] >= 0
+
+
+def test_local_stt_with_requested_language(
+    tmp_path: Path,
+    monkeypatch,
+):
+    audio_file = tmp_path / "sample.wav"
+    audio_file.write_bytes(b"fake audio data")
+
+    class FakeSegment:
+        text = "What is RAG?"
+
+    class FakeInfo:
+        language = "en"
+
+    class FakeModel:
+        def transcribe(self, audio_path, language=None):
+            assert language == "en"
+
+            return (
+                [FakeSegment()],
+                FakeInfo(),
+            )
+
+    monkeypatch.setattr(
+        "app.voice.audio.get_stt_model",
+        lambda: FakeModel(),
+    )
+
+    result = transcribe_audio(
+        str(audio_file),
+        language="en",
+    )
+
+    assert result["text"] == "What is RAG?"
+    assert result["language"] == "en"
+    assert result["model"] == "small"
+
+
+def test_local_stt_failure(
+    tmp_path: Path,
+    monkeypatch,
+):
+    audio_file = tmp_path / "sample.wav"
+    audio_file.write_bytes(b"fake audio data")
+
+    class FakeModel:
+        def transcribe(self, audio_path, language=None):
+            raise RuntimeError("transcription failed")
+
+    monkeypatch.setattr(
+        "app.voice.audio.get_stt_model",
+        lambda: FakeModel(),
+    )
+
+    with pytest.raises(STTProviderError) as exc_info:
+        transcribe_audio(str(audio_file))
+
+    error = exc_info.value
+
+    assert error.reason_code == "STT_LOCAL_ERROR"
+
+
+def test_empty_transcript(
+    tmp_path: Path,
+    monkeypatch,
+):
+    audio_file = tmp_path / "sample.wav"
+    audio_file.write_bytes(b"fake audio data")
+
+    class FakeSegment:
+        text = "   "
+
+    class FakeInfo:
+        language = "en"
+
+    class FakeModel:
+        def transcribe(self, audio_path, language=None):
+            return (
+                [FakeSegment()],
+                FakeInfo(),
+            )
+
+    monkeypatch.setattr(
+        "app.voice.audio.get_stt_model",
+        lambda: FakeModel(),
+    )
+
+    with pytest.raises(STTProviderError) as exc_info:
+        transcribe_audio(str(audio_file))
+
+    error = exc_info.value
+
+    assert error.reason_code == "STT_EMPTY_TRANSCRIPT"

@@ -12,7 +12,7 @@ def test_voice_ask_success(monkeypatch):
             "text": "What is artificial intelligence?",
             "language": "en",
             "latency_ms": 120,
-            "model": "openai/whisper-1",
+            "model": "small",
         }
 
     def fake_generate_grounded_answer(
@@ -72,7 +72,7 @@ def test_voice_ask_clear_audio(monkeypatch):
             "text": "What is machine learning?",
             "language": "en",
             "latency_ms": 110,
-            "model": "openai/whisper-1",
+            "model": "small",
         }
 
     def fake_generate_grounded_answer(
@@ -131,7 +131,7 @@ def test_voice_ask_background_noise(monkeypatch):
             "text": "What is cloud computing?",
             "language": "en",
             "latency_ms": 145,
-            "model": "openai/whisper-1",
+            "model": "small",
         }
 
     def fake_generate_grounded_answer(
@@ -190,7 +190,7 @@ def test_voice_ask_domain_terms(monkeypatch):
             "text": "Explain retrieval augmented generation and vector embeddings.",
             "language": "en",
             "latency_ms": 160,
-            "model": "openai/whisper-1",
+            "model": "small",
         }
 
     def fake_generate_grounded_answer(
@@ -297,14 +297,13 @@ def test_voice_ask_audio_size_limit():
     assert response.json()["error_code"] == "HTTP_ERROR"
 
 
-def test_voice_ask_stt_provider_failure(monkeypatch):
+def test_voice_ask_stt_local_failure(monkeypatch):
     from app.voice.audio import STTProviderError
 
     def fake_transcribe_audio(audio_path):
         raise STTProviderError(
-            "STT provider failed.",
-            status_code=402,
-            reason_code="STT_CREDITS_REQUIRED",
+            "Local STT transcription failed.",
+            reason_code="STT_LOCAL_ERROR",
         )
 
     monkeypatch.setattr(
@@ -323,5 +322,5 @@ def test_voice_ask_stt_provider_failure(monkeypatch):
         },
     )
 
-    assert response.status_code == 402
-    assert response.json()["error_code"] == "STT_CREDITS_REQUIRED"
+    assert response.status_code == 502
+    assert response.json()["error_code"] == "STT_LOCAL_ERROR"

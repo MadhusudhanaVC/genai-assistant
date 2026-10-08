@@ -2,7 +2,7 @@
 
 ## Day 17: Integrate Speech-to-Text with the RAG API
 
-A FastAPI-based Retrieval-Augmented Generation (RAG) assistant with input guardrails, grounded answer generation, request/stage logging, and voice-question support through speech-to-text.
+A FastAPI-based Retrieval-Augmented Generation (RAG) assistant with input guardrails, grounded answer generation, request/stage logging, and voice-question support through local speech-to-text.
 
 ---
 
@@ -46,19 +46,19 @@ The application includes:
 - Request and stage-level observability
 - Evidence and citation validation
 - Safe abstention for unsupported answers
-- Voice-question support through speech-to-text
+- Voice-question support through local speech-to-text
 
-Day 17 extends the existing text-based RAG API so a user can submit a short audio question and receive the same type of grounded RAG response produced by the existing `/ask` pipeline.
+Day 17 extends the existing text-based RAG API so a user can submit a short audio question, transcribe it locally, and receive the same type of grounded RAG response produced by the existing `/ask` pipeline.
 
 ---
 
 ## 2. Day 17 Objective
 
-***Integrate Speech-to-Text with the RAG API.***
+**Integrate Speech-to-Text with the RAG API.**
 
-The objective of Day 17 is to accept a short audio question, transcribe it using a speech-to-text provider, and send the resulting transcript through the existing `/ask` RAG pipeline.
+The objective of Day 17 is to accept a short audio question, transcribe it using local speech-to-text, and send the resulting transcript through the existing `/ask` RAG pipeline.
 
-> The implementation must **not** create a separate RAG implementation for voice input.
+> The implementation does **not** create a separate RAG implementation for voice input.
 
 The intended flow is:
 
@@ -69,7 +69,7 @@ Audio Question
 Audio Validation
       │
       ▼
-Speech-to-Text
+Local Speech-to-Text
       │
       ▼
 Transcript
@@ -87,7 +87,7 @@ The Day 17 implementation also records stage-level timing and failures, so STT l
 
 ## 3. Day 16 Foundation
 
-Day 16 is retained only as the foundation for Day 17.
+Day 16 is retained as the foundation for Day 17.
 
 The existing application already provides:
 
@@ -120,7 +120,7 @@ The API must:
 
 The STT layer must:
 
-- Send valid audio to the configured STT provider.
+- Process valid audio using the local speech-to-text implementation.
 - Capture the returned transcript.
 - Capture the detected language when available.
 - Record STT latency.
@@ -143,7 +143,7 @@ The request must provide stage-level evidence for:
 - Request ID
 - Audio metadata
 - STT latency
-- Transcript (or approved transcript logging)
+- Transcript
 - RAG latency
 - Total request latency
 - Failed stage, when applicable
@@ -152,22 +152,36 @@ The request must provide stage-level evidence for:
 
 ## 5. Day 17 Implementation
 
-Day 17 adds a voice endpoint and STT integration while preserving the existing `/ask` behavior.
+Day 17 adds a voice endpoint and local STT integration while preserving the existing `/ask` behavior.
 
 The main implementation consists of:
 
 1. Audio upload validation
 2. Temporary audio-file handling
-3. Speech-to-text transcription
+3. Local speech-to-text transcription
 4. Transcript validation
 5. Reuse of the existing RAG question-processing function
 6. STT stage logging
 7. RAG stage logging
-8. Total request logging through existing middleware
+8. Total request logging through existing request logging
 9. Safe transcription handling
 10. Automated voice tests
 
-The implementation uses **OpenRouter** for the STT request with the `openai/whisper-large-v3-turbo` model.
+The local STT implementation uses:
+
+```text
+faster-whisper==1.2.1
+```
+
+The configured model and runtime settings are:
+
+```text
+Model:         small
+Device:        cpu
+Compute type:  int8
+```
+
+The Whisper model is loaded lazily and reused for subsequent transcription requests.
 
 ---
 
@@ -211,6 +225,50 @@ app/voice/audio.py
 
 This provides validation both at the API upload boundary and inside the STT utility.
 
+### Verified unsupported-file behavior
+
+An unsupported audio file was tested through `/voice/ask` and was safely rejected:
+
+```text
+HTTP 400 Bad Request
+
+{
+  "error_code": "HTTP_ERROR",
+  "message": "Unsupported audio format.",
+  "request_id": "<request-id>"
+}
+```
+
+The unsupported file is rejected before it reaches the transcription and RAG stages.
+
+### Verified empty-file behavior
+
+An empty audio file was tested and was safely rejected:
+
+```text
+HTTP 400 Bad Request
+
+{
+  "error_code": "HTTP_ERROR",
+  "message": "Audio file is empty.",
+  "request_id": "<request-id>"
+}
+```
+
+### Verified excessive-size behavior
+
+An audio file larger than the 10 MB limit was tested and was safely rejected:
+
+```text
+HTTP 400 Bad Request
+
+{
+  "error_code": "HTTP_ERROR",
+  "message": "Audio file exceeds the 10 MB size limit.",
+  "request_id": "<request-id>"
+}
+```
+
 ---
 
 ## 7. Speech-to-Text Integration
@@ -221,36 +279,65 @@ The STT implementation is located in:
 app/voice/audio.py
 ```
 
-**Provider endpoint:**
+The implementation uses the local `faster-whisper` package rather than a remote STT API.
+
+**STT package:**
 
 ```text
-https://openrouter.ai/api/v1/audio/transcriptions
+faster-whisper==1.2.1
 ```
 
 **STT model:**
 
 ```text
-openai/whisper-large-v3-turbo
+small
 ```
 
-The audio bytes are Base64 encoded and sent through the provider request.
+**Runtime:**
 
-**The returned STT result includes:**
+```text
+device=cpu
+compute_type=int8
+```
+
+The local transcription function:
+
+- Validates the audio path.
+- Validates the file size.
+- Validates the audio extension.
+- Loads the local Whisper model when required.
+- Transcribes the audio.
+- Combines the returned segments into a transcript.
+- Captures detected language when available.
+- Measures STT latency.
+- Returns the transcript, language, latency, and model information.
+
+The returned STT result contains:
 
 | Field | Description |
 |---|---|
 | `text` | The transcript |
-| `language` | Detected (or fallback) language |
+| `language` | Detected or requested language |
 | `latency_ms` | STT latency in milliseconds |
 | `model` | STT model used |
 
-The provider-detected language is preferred when available. If the provider does not return a language, the requested language is used as the fallback when one was supplied.
+### STT failure handling
 
-**Exceptions:**
+Local transcription failures are converted into a controlled `STTProviderError` with a reason code.
 
-| Exception | Meaning |
-|---|---|
-| `AudioValidationError` | Audio validation failures |
+Example logged failure:
+
+```text
+Stage: STT
+Status: FAILED
+Reason code: STT_LOCAL_ERROR
+```
+
+An empty transcription result is handled separately with:
+
+```text
+STT_EMPTY_TRANSCRIPT
+```
 
 ---
 
@@ -281,7 +368,7 @@ Start STT stage
        ▼
 transcribe_audio()
        │
-       ├── Unsuccessful ───► Safe processing outcome
+       ├── Failure ───────► STT failure + stage log
        │
        ▼
 Transcript
@@ -305,7 +392,7 @@ Voice response
 Remove temporary file
 ```
 
-The transcript is passed to the same question-processing path used by the normal text request. This ensures voice input does not bypass the application's existing RAG, grounding, and output controls.
+The transcript is passed to the same question-processing path used by the normal text request. This ensures voice input does not bypass the application's existing RAG, grounding, guardrail, and output controls.
 
 ---
 
@@ -329,25 +416,55 @@ STT
 RAG
 ```
 
-Typical successful evidence looks like:
+The total request latency is recorded separately by the existing request logging mechanism.
+
+### Verified successful request
+
+A real successful `/voice/ask` request was verified with:
 
 ```text
-STT | SUCCESS | 160 ms
-RAG | SUCCESS | 60 ms
+Request ID:
+e1a1e90e-3e39-4b6b-b08d-c399c9c4d9a9
+
+STT:
+SUCCESS
+Latency: 93448 ms
+
+RAG:
+SUCCESS
+Latency: 73305 ms
+
+Total request:
+SUCCESS
+Latency: 170689 ms
 ```
 
-The total request latency is recorded separately by the existing request middleware.
-
-**Example verified successful request:**
+The corresponding `APIRequest` record contained:
 
 ```text
-STT latency:   160 ms
-RAG latency:    60 ms
-Total latency: 454 ms
-Outcome:       SUCCESS
+endpoint: /voice/ask
+total_latency_ms: 170689
+outcome: SUCCESS
+error_category: None
 ```
 
-**The STT details can include:**
+This verifies that STT, RAG, and total request timing are available separately.
+
+### STT failure logging
+
+A failed STT request was also verified in the database:
+
+```text
+Stage: STT
+Status: FAILED
+Reason code: STT_LOCAL_ERROR
+```
+
+This confirms that the failed processing stage can be identified.
+
+### STT details
+
+Successful STT stage details can include:
 
 ```text
 filename
@@ -358,13 +475,11 @@ model
 transcript
 ```
 
-Stage details record the processing outcome and timing.
-
 ---
 
 ## 10. Database Changes
 
-The `RequestStage` model was extended to support stage-level timing and details.
+The `RequestStage` model provides stage-level timing and details.
 
 **File:**
 
@@ -384,33 +499,19 @@ details
 timestamp
 ```
 
-The stage logging helper was updated in:
+The stage logging helper is implemented in:
 
 ```text
 app/db/crud.py
 ```
 
-The helper now accepts:
+The existing request-level logging records total request latency through:
 
 ```text
-latency_ms
-details
+app/middleware/request_logging.py
 ```
 
-The existing SQLite database was migrated to add:
-
-```text
-latency_ms INTEGER
-details TEXT
-```
-
-A database backup was created before the schema change:
-
-```text
-genai_day17_backup.db
-```
-
-The backup is retained as a safety copy.
+The Day 17 implementation therefore provides both stage-level and request-level observability.
 
 ---
 
@@ -477,17 +578,17 @@ The important Day 17 addition is the `transcript` field. The answer itself conti
 
 | File | Purpose |
 |---|---|
-| `app/voice/audio.py` | Audio validation, speech-to-text integration, transcript handling, and STT latency |
+| `app/voice/audio.py` | Audio validation, local speech-to-text, transcript handling, and STT latency |
 | `app/api/routes.py` | `/voice/ask` endpoint and connection from transcript to existing RAG processing |
-| `app/models/api.py` | `VoiceAskResponse` response model |
+| `app/models/api.py` | Voice response model |
 | `app/api/errors.py` | Structured API error responses for voice processing |
-| `app/main.py` | Registers the voice-processing error handler |
+| `app/main.py` | Registers API error handlers |
 | `app/db/models.py` | Request-stage database fields for latency and details |
 | `app/db/crud.py` | Persists stage-level logs |
 | `app/middleware/request_logging.py` | Records request-level total latency and outcome |
 | `tests/test_voice_audio.py` | Unit tests for audio validation and STT behavior |
 | `tests/test_voice_api.py` | Voice API endpoint and error-path tests |
-| `requirements.txt` | Includes `python-multipart` and `requests` dependencies |
+| `requirements.txt` | Project dependencies including `faster-whisper` and `python-multipart` |
 
 Existing RAG files are reused for the actual answer-generation path.
 
@@ -497,7 +598,11 @@ Existing RAG files are reused for the actual answer-generation path.
 
 ### Voice API Test Suite
 
-File: `tests/test_voice_api.py`
+File:
+
+```text
+tests/test_voice_api.py
+```
 
 Verified result:
 
@@ -505,7 +610,7 @@ Verified result:
 8 passed
 ```
 
-The tests covered:
+The tests cover:
 
 ```text
 voice request success
@@ -515,33 +620,49 @@ domain terms
 empty audio
 unsupported audio type
 audio size limit
-STT processing handling
+local STT failure handling
 ```
 
 ### Voice Audio Unit Tests
 
-File: `tests/test_voice_audio.py`
+File:
+
+```text
+tests/test_voice_audio.py
+```
 
 Verified result:
 
 ```text
-6 passed
+8 passed
 ```
 
-The tests covered:
+The tests cover:
 
 ```text
 missing audio file
 empty audio file
 unsupported audio format
-STT processing handling
 audio file size limit
-provider-detected language
+local STT transcription
+requested language handling
+local STT failure
+empty transcript
 ```
+
+### Combined Voice Test Evidence
+
+The voice audio and voice API test suites were also executed together:
+
+```text
+16 passed
+```
+
+This verifies the automated Day 17 voice test coverage.
 
 ### Python Syntax Verification
 
-The API routes file was also checked with:
+The API routes file was checked with:
 
 ```cmd
 python -m py_compile app\api\routes.py
@@ -555,89 +676,197 @@ The syntax check passed.
 
 The Day 17 voice test coverage includes the required input categories.
 
-| Test Case | Expected Behavior |
-|---|---|
-| Clear audio | Transcribe and continue to RAG |
-| Mild background noise | Continue when transcription succeeds |
-| Domain terms | Preserve useful domain terminology in transcript |
-| Empty audio | Reject safely |
-| Unsupported format/type | Reject safely |
-| Excessive audio size | Reject safely |
-| Provider-detected language | Preserve detected language |
+| Test Case | Expected Behavior | Result |
+|---|---|---|
+| Clear audio | Transcribe and continue to RAG | ✅ Verified |
+| Mild background noise | Continue when transcription succeeds | ✅ Verified |
+| Domain terms | Preserve useful domain terminology in transcript | ✅ Verified |
+| Empty audio | Reject safely | ✅ Verified |
+| Unsupported format/type | Reject safely | ✅ Verified |
+| Excessive audio size | Reject safely | ✅ Verified |
+| Local STT failure | Identify STT failure safely | ✅ Verified |
 
-A successful mocked/domain test produced the following evidence:
+### Real transcript examples
+
+**Clear audio:**
 
 ```text
-Transcript:
-Explain retrieval augmented generation and vector embeddings.
-
-Language:
-en
-
-STT:
-SUCCESS
-
-RAG:
-SUCCESS
-
-Total request:
-SUCCESS
+What is the main purpose of this gen AI assistant?
 ```
+
+The local STT transcription was successful.
+
+**Background noise:**
+
+```text
+What is cloud computing?
+```
+
+The transcript was successfully produced.
+
+**Domain terms:**
+
+```text
+Explain retrieval augmented generation and vector embeddings.
+```
+
+The transcript preserved the domain terminology correctly.
 
 ---
 
 ## 16. Real Audio Validation
 
-A real Windows Sound Recorder file was prepared for Day 17 validation:
+Real audio files were prepared for Day 17 validation, including:
 
 ```text
 day17_clear_question.wav.m4a
+day17_supported_question.m4a.m4a
+day17_background_noise.m4a.m4a
+day17_domain_terms.m4a.m4a
+empty.wav
 ```
 
-**File size:** `158,762 bytes`
+The clear audio question:
 
-The `.m4a` format is supported by the Day 17 audio validation layer.
+```text
+What is the main purpose of this gen AI assistant?
+```
 
-The audio file is included as the real-world validation sample for the Day 17 voice workflow.
+was transcribed successfully by the local `faster-whisper` implementation.
 
-The automated test suite provides the controlled validation evidence for audio validation, speech-to-text handling, voice API processing, stage-level logging, and integration with the existing RAG pipeline.
+The supported-question audio:
+
+```text
+What are some common applications of artificial intelligence?
+```
+
+produced the transcript:
+
+```text
+What are some common applications of artificial intelligence?
+```
+
+The corresponding voice request returned a grounded RAG answer with citation:
+
+```text
+[DOC019 | DOC019_CHUNK_001]
+```
 
 ---
 
 ## 17. Evidence and Verification
 
+### Voice vs Text Verification
+
+The same question was tested through both the text and voice paths:
+
+```text
+Question:
+What are some common applications of artificial intelligence?
+```
+
+The text request through:
+
+```text
+POST /ask
+```
+
+returned a grounded answer with:
+
+```text
+[DOC019 | DOC019_CHUNK_001]
+```
+
+The voice request through:
+
+```text
+POST /voice/ask
+```
+
+produced the same transcript and the same grounded citation:
+
+```text
+[DOC019 | DOC019_CHUNK_001]
+```
+
+This verifies that valid voice input reaches the same existing RAG processing path as equivalent text input.
+
 ### Successful Voice Pipeline Evidence
 
-A successful test request produced:
+A successful real voice request produced:
 
 ```text
 Request ID:
-a020c7ea-166a-4055-9dee-4642f9b20263
+e1a1e90e-3e39-4b6b-b08d-c399c9c4d9a9
+
+Endpoint:
+/voice/ask
 
 STT:
 SUCCESS
-Latency: 160 ms
-
-Transcript:
-Explain retrieval augmented generation and vector embeddings.
-
-Language:
-en
-
-Model:
-openai/whisper-large-v3-turbo
+Latency: 93448 ms
 
 RAG:
 SUCCESS
-Latency: 60 ms
-Source count: 1
+Latency: 73305 ms
 
 Total request:
 SUCCESS
-Latency: 454 ms
+Latency: 170689 ms
+
+Outcome:
+SUCCESS
 ```
 
-This verifies that the transcript can enter the existing RAG pipeline and that STT and RAG timings are recorded separately.
+### Unsupported Audio Evidence
+
+An unsupported audio format was tested through the real API:
+
+```text
+HTTP 400 Bad Request
+
+message:
+Unsupported audio format.
+```
+
+### Empty Audio Evidence
+
+An empty audio file was tested through the real API:
+
+```text
+HTTP 400 Bad Request
+
+message:
+Audio file is empty.
+```
+
+### Excessive Audio Evidence
+
+An audio file larger than 10 MB was tested through the real API:
+
+```text
+HTTP 400 Bad Request
+
+message:
+Audio file exceeds the 10 MB size limit.
+```
+
+### Failed-Stage Evidence
+
+A local STT failure was recorded as:
+
+```text
+Stage:
+STT
+
+Status:
+FAILED
+
+Reason code:
+STT_LOCAL_ERROR
+```
+
+This confirms that failures identify the stage where processing stopped.
 
 ---
 
@@ -645,24 +874,26 @@ This verifies that the transcript can enter the existing RAG pipeline and that S
 
 | Completion Gate | Evidence | Status |
 |---|---|---|
+| Valid audio produces a grounded response | Real voice validation | ✅ Verified |
 | Valid audio can enter the voice API | Voice API tests | ✅ Verified |
-| Empty audio is rejected safely | Voice API and audio unit tests | ✅ Verified |
-| Unsupported audio is rejected safely | Voice API and audio unit tests | ✅ Verified |
-| Excessive audio is rejected safely | Voice API and audio unit tests | ✅ Verified |
+| Empty audio is rejected safely | Real API + automated tests | ✅ Verified |
+| Unsupported audio is rejected safely | Real API + automated tests | ✅ Verified |
+| Excessive audio is rejected safely | Real API + automated tests | ✅ Verified |
 | STT integration is implemented | `app/voice/audio.py` | ✅ Verified |
-| Transcript is passed to existing RAG | Successful voice API test | ✅ Verified |
+| Transcript is passed to existing RAG | Voice vs text verification | ✅ Verified |
 | STT latency is recorded | Request-stage evidence | ✅ Verified |
 | RAG latency is recorded | Request-stage evidence | ✅ Verified |
-| Total request latency is recorded | Request middleware evidence | ✅ Verified |
-| Failed stage is identifiable | Request-stage evidence | ✅ Verified |
+| Total request latency is recorded | API request evidence | ✅ Verified |
+| Failed stage is identifiable | STT failure stage log | ✅ Verified |
 | Voice API tests pass | 8 passed | ✅ Verified |
-| STT unit tests pass | 6 passed | ✅ Verified |
+| STT unit tests pass | 8 passed | ✅ Verified |
+| Combined voice tests pass | 16 passed | ✅ Verified |
 
 ### Completion Assessment
 
-The Day 17 implementation and automated validation requirements are in place.
+The Day 17 implementation and automated validation requirements are complete.
 
-The voice workflow accepts validated audio, processes the transcript through the existing RAG pipeline, records stage-level timing, and provides the required automated test coverage.
+The voice workflow accepts validated audio, performs local speech-to-text, sends the transcript through the existing RAG pipeline, records stage-level timing, identifies failed stages, and safely handles unsupported, empty, and oversized audio.
 
 ---
 
@@ -677,7 +908,7 @@ python -m pytest tests\test_voice_audio.py -v
 Expected result:
 
 ```text
-6 passed
+8 passed
 ```
 
 ### Verify Voice API Tests
@@ -690,6 +921,18 @@ Expected result:
 
 ```text
 8 passed
+```
+
+### Verify Both Voice Test Suites
+
+```cmd
+python -m pytest tests\test_voice_audio.py tests\test_voice_api.py -v
+```
+
+Expected result:
+
+```text
+16 passed
 ```
 
 ### Verify API Route Syntax
@@ -770,9 +1013,9 @@ Audio validation
 Temporary audio file
  │
  ▼
-STT
+Local STT
  │
- ├── Unsuccessful ─────────► Safe processing outcome
+ ├── Failed ───────────────► STT failure + stage log
  │
  ▼
 Transcript
@@ -819,17 +1062,35 @@ Request
 
 ## 21. Day 17 Status
 
-### ✅ Day 17: IMPLEMENTED AND TESTED
+### ✅ Day 17: COMPLETE — IMPLEMENTED, TESTED, AND VERIFIED
 
-**Speech-to-text integration • Audio validation • Voice API endpoint • Existing RAG reuse • STT/RAG stage logging • Voice automated tests**
+**Speech-to-text integration • Audio validation • Unsupported-file handling • Empty-file handling • Size validation • Voice API endpoint • Existing RAG reuse • STT/RAG stage logging • Total latency logging • Failed-stage identification • Voice automated tests**
 
 Verified automated evidence:
 
 ```text
-Voice API tests:   8 passed
-Voice audio tests: 6 passed
+Voice API tests:     8 passed
+Voice audio tests:   8 passed
+Combined voice:     16 passed
 ```
 
-The Day 17 implementation successfully demonstrates the controlled voice-to-RAG workflow through automated validation.
+Verified real API behavior:
 
-Day 16 functionality remains available as the foundation for Day 17, while this README remains focused on the Day 17 speech-to-text and voice-to-RAG implementation.
+```text
+Unsupported audio:   HTTP 400
+Empty audio:         HTTP 400
+Oversized audio:     HTTP 400
+STT failure:         STT FAILED + reason code
+Voice → RAG:         Verified
+```
+
+Verified successful request observability:
+
+```text
+STT latency:          93448 ms
+RAG latency:          73305 ms
+Total request:       170689 ms
+Outcome:             SUCCESS
+```
+
+Day 16 functionality remains available as the foundation for Day 17, while this README focuses on the Day 17 speech-to-text and voice-to-RAG implementation.
